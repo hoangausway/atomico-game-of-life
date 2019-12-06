@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <link rel="manifest" href="manifest.json" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="128x128"
+      href="img/icons/icon-128x128.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="img/icons/icon-512x512.png"
+    />
+    <meta name="theme-color" content="#232329" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="folder" />
+    <link rel="apple-touch-icon" href="img/icons/icon-128x128.png" />
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .note {
+        margin: 20px 20px 60px 20px;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: 16px;
+      }
+      .note > p {
+        margin: 6px;
+      }
+
+      button {
+        width: 120px;
+        height: 32px;
+        margin: 20px 0px 0px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.8rem;
+        padding-top: 4px;
+        color: white;
+        background-color: darkred;
+      }
+      .paused {
+        background-color: darkgreen;
+      }
+
+      .reset {
+        background-color: navy;
+      }
+
+      .one-cell {
+        display: block;
+        width: 40px;
+        height: 40px;
+        margin: 20px;
+      }
+      .four-cell {
+        width: 80px;
+        height: 80px;
+        margin: 20px;
+      }
+      .nine-cell {
+        width: 120px;
+        height: 120px;
+        margin: 20px;
+      }
+
+      .gol-container {
+        width: 600px;
+        height: 600px;
+        margin: 20px;
+      }
+    </style>
+    <script>
+      window.onload = function() {
+        /* game-of-life */
+        function drawPattern(rows, cols, pattern) {
+          const { matrix, originX, originY } = pattern;
+
+          /* make a copy of world to modify */
+          const arr = Array(rows * cols).fill(false);
+
+          /* update each cell according to the pattern */
+          let x, y;
+          for (y = 0; y < matrix.length; y++) {
+            for (x = 0; x < matrix[0].length; x++) {
+              /* check that we are still within the bounds of the world */
+              if (originY + y < rows && originX + x < cols) {
+                arr[(originY + y) * cols + originX + x] = matrix[y][x] === 1;
+              }
+            }
+          }
+
+          return { arr, rows, cols };
+        }
+        function makePattern(patternName, originX, originY) {
+          return { matrix: patterns[patternName], originX, originY };
+        }
+        const patterns = {
+          // oscillators
+          BLINKER: [
+            [0, 0, 0],
+            [1, 1, 1],
+            [0, 0, 0],
+          ],
+
+          TOAD: [
+            [0, 1, 1, 1],
+            [1, 1, 1, 0],
+          ],
+          QUEEN_BEE_SHUTTLE: [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          ],
+        };
+        const pattern = {
+          matrix: patterns["QUEEN_BEE_SHUTTLE"],
+          originX: 5,
+          originY: 5,
+        };
+        const initialWorld = drawPattern(40, 40, pattern);
+        const gameOfLife = document.getElementById("game-of-life-40");
+        gameOfLife.initialWorld = initialWorld;        
+        gameOfLife.tick = 1000;
+        // start the game in 0.5 secnds
+        setTimeout(function(){ gameOfLife.active = true; }, 500);
+
+
+        /* PAUSE/ACTIVATE */
+        const btnPause = document.getElementById("btn-pause-activate");
+        btnPause.addEventListener("click", e => {
+          const isPaused = btnPause.classList.toggle("paused");
+          btnPause.textContent = isPaused ? "CONTINUE" : "PAUSE";
+          console.log(btnPause.textContent)
+          gameOfLife.active = !isPaused;
+        });
+
+        /* RESTART */
+        const btnReset = document.getElementById("btn-reset");
+        btnReset.addEventListener("click", e => {
+          console.log("RESET")
+          // reset the game in 0.5 seconds
+          gameOfLife.initialWorld = null;
+          setTimeout(function(){ gameOfLife.initialWorld = initialWorld; }, 500);
+        });
+      };
+    </script>
+  </head>
+  <body>
+    <button id="btn-reset" class="reset">RESET</button>
+    <button id="btn-pause-activate">PAUSE</button>
+    <div class="gol-container">
+      <game-of-life id="game-of-life-40"></game-of-life>
+    </div>
+    <div class="note">
+        <p>Click on cells will change the course of evolution</p>
+        <p><strong>Note:</strong> The game was started with famous pattern named "Queen Bee Shuttle".</p>
+        <p>A comprehensive list of patterns can be found in file patterns.js from source codes.</p>
+        <p>Game description: <a href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life">Conway's Game Of Life</a></p>
+    </div>
+    <!-- component: hello-world
+      original example of Atomico author.
+    -->
+    <hello-world></hello-world>
+
+    <script type="module" src="./src/index.js"></script>
+    <!--Delete comment to activate PWA
+		<script>
+			if ("serviceWorker" in navigator) {
+				navigator.serviceWorker.register("sw.js");
+			}
+		</script>
+    -->
+  </body>
+</html>
