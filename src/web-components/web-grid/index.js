@@ -23,7 +23,7 @@ const WebGrid = props => {
       {world.arr.map((val, idx) => {
         const row = Math.floor(idx / world.cols)
         const col = idx - row * world.cols
-        return <web-cell key={idx} col={col} row={row} live={val} />
+        return <web-cell key={idx} col={col} row={row} alive={val} />
       })}
     </host>
   )

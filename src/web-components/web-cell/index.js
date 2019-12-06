@@ -10,13 +10,13 @@ const WebCell = props => {
     <host
       shadowDom
       onclick={e => dispatchToggleCell(props)}
-      style={getStyle(props.live)}
+      style={getStyle(props.alive)}
     />
   )
 }
 
 WebCell.props = {
-  live: Boolean,
+  alive: Boolean,
   col: Number,
   row: Number
 }
@@ -24,13 +24,13 @@ WebCell.props = {
 export default customElement('web-cell', WebCell)
 
 // Helpers CSS
-const getStyle = live => {
+const getStyle = alive => {
   return {
     display: 'block',
     cursor: 'pointer',
     width: '100%',
     height: '100%',
     border: '1px solid gray',
-    background: live ? 'MidnightBlue' : 'AliceBlue'
+    background: alive ? 'MidnightBlue' : 'AliceBlue'
   }
 }
