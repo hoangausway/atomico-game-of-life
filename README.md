@@ -1,8 +1,8 @@
-# A simple "game" component using Atomico - `<random-flip>`
+# The Conway's Game Of Life using Atomico and RxJS - `<game-of-life>`
 
 ## Subjects
 
-- Web component, Atomico
+- Web component, Atomico, RxJS
 - Build Conway's Game Of Life  with Atomico and RxJS
 
 ## To show
