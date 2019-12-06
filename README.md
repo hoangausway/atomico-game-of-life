@@ -40,4 +40,4 @@ A good source introducing Reactive Programming/RxJs/Game Of Life: [https://docs.
 ## What's next
 Improve `<game-of-life>` from some aspects.  It's nice to add a web component playing "control panel" role, which allows user to change tick's duration, to apply initial world pattern from predefined list of famous patterns.
 
-Or, we could maybe accumulate some interesting statistic data (for example, max/min number of life cells).
+Or, we could accumulate some interesting statistic data (for example, max/min number of life cells).
