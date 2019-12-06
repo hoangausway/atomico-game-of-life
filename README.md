@@ -28,6 +28,16 @@ npm run server # run dev server at port 8080
 ## Component's logics
 **`<game-of-life>`**
 
+**Quick description**
+
+- Grid of "alive" and "dead" cells
+- In each iteration of the game (a "tick"), cells become dead or alive based on the previous state of the neighboughhood:
+  - **underpopulation:** any live cell with < 2 live neighbours dies
+  - **overpopulation:** any live cell with > 3 live neighbours dies
+  - **reproduction:** any dead cell with exactly 3 live neighbours becomes a live cell
+
+**Links**
+
 The description of Conway's Game Of Life: [https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life]
 
 A good source introducing Reactive Programming/RxJs/Game Of Life: [https://docs.google.com/presentation/d/e/2PACX-1vQ06TaoEe3o9Xu7FluNigjqaKwXreoPj4xYgZ-ZCAw4cXlMSPpEqAH0re11eP2_uzw7N_hpEZ33gWsG/pub?start=false&loop=false&delayms=3000&slide=id.g34fa86e976_0_0]
