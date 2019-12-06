@@ -9,6 +9,7 @@
 - Define a web component without class (Atomico way, likes modern React)
 - Using 'props' to set properties to web component (Atomico way, some 'yes' and 'no')
 - Using dispatch mechanism to raise event from web component to outside world
+- Taste Functional Reactive Programming (RxJS) with Atomico
 
 ## Source - Build - Run
 
