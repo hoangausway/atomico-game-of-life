@@ -11,9 +11,8 @@ INPUT
   observers:
   - worldObserver to observe combination of events: 'tick', 'toggle cell', and 'paused'
   - pauseObserver to observe event of 'paused' value
-  - countObserver to observe event of 'number of live cells' value
   initialWorld: initial world state
-  tick: time interval event
+  initialResetEvent: initial reset event
 OUPUT
   handlers:
   - pauseEmit: triggers emitting of 'paused' event
@@ -23,12 +22,12 @@ OUPUT
 const useEventOfLife = (observers, initialWorld, initialResetEvent) => {
   const [worldObserver, pauseObserver, resetObserver] = observers
 
-  // define events and related triggers
+  // define event streams and related triggers
   const [toggleEmit, toggleEvent$] = useEventStream()
   const [pauseEmit, pauseEvent$] = useEventStream()
   const [resetEmit, resetEvent$] = useEventStream()
 
-  // add events' types
+  // preprocess streams
   const reset$ = resetEvent$.pipe(
     map(e => ({
       ...e,
@@ -48,10 +47,11 @@ const useEventOfLife = (observers, initialWorld, initialResetEvent) => {
     map(e => ({ ...e, world_event_type: WorldEventTypes.ACTIVATE }))
   )
 
-  // make stream of events which change the world state
+  // make combined stream of events which change the world state
   const worldStream$ = makeWorldStream(initialWorld, toggle$, pause$, reset$)
 
-  // transform pauseClick event which change pauseText state
+  // optional: transform the pauseStream.
+  // It's observer can track paused value and respond if needed.
   const pauseStream$ = pauseEvent$.pipe(scan((paused, event) => !paused, true))
 
   useEffect(() => {

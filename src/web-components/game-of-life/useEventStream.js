@@ -3,7 +3,7 @@ import { Subject } from 'rxjs'
 
 /*
   returns
-  eventEmit: emit stream triggered by a DOM/Cuctom event
+  eventEmit: emit stream triggered by a DOM/Custom event
   eventStream$: emitted stream
 */
 export const useEventStream = () => {

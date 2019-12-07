@@ -1,7 +1,6 @@
 import { merge, interval } from 'rxjs'
-import { map, scan, filter, switchMap } from 'rxjs/operators'
 // eslint-disable-next-line
-import { tap } from 'rxjs/operators'
+import { map, scan, filter, switchMap, tap } from 'rxjs/operators'
 
 /*
   Streams Of Life:
