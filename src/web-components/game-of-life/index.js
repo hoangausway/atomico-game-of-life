@@ -47,7 +47,7 @@ const GameOfLife = props => {
   useEffect(() => pauseEmit(pauseEvent()), [active])
 
   return (
-    <host shadowDom onworldchange={toggleEmit}>
+    <host shadowDom ontogglecell={toggleEmit}>
       <web-grid world={world} />
     </host>
   )
