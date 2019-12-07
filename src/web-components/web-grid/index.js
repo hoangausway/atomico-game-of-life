@@ -1,14 +1,14 @@
-import { h, customElement, useProp, useEvent } from 'atomico'
+import { h, customElement } from 'atomico'
 import '../web-cell'
 
 const WebGrid = props => {
-  const [world] = useProp('world')
+  const { arr, cols, rows } = props.world
 
   return (
-    <host shadowDom style={style(world.cols, world.rows)}>
-      {world.arr.map((val, idx) => {
-        const row = Math.floor(idx / world.cols)
-        const col = idx - row * world.cols
+    <host shadowDom style={style(cols, rows)}>
+      {arr.map((val, idx) => {
+        const row = Math.floor(idx / cols)
+        const col = idx - row * cols
         return <web-cell key={idx} col={col} row={row} alive={val} />
       })}
     </host>
