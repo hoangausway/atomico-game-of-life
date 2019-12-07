@@ -31,7 +31,7 @@ npm run server # run dev server at port 8080
 **Quick description**
 
 - Grid of "alive" and "dead" cells
-- In each iteration of the game (a "tick"), cells become dead or alive based on the previous state of the neighboughhood:
+- In each iteration of the game (a "tick"), cells become dead or alive based on the previous state of the neighbourhood:
   - **underpopulation:** any live cell with < 2 live neighbours dies
   - **overpopulation:** any live cell with > 3 live neighbours dies
   - **reproduction:** any dead cell with exactly 3 live neighbours becomes a live cell
