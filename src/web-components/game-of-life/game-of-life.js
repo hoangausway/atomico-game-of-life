@@ -1,7 +1,7 @@
 import { h, customElement, useState, useEffect } from 'atomico'
 
 import useEventOfLife from './useEventOfLife'
-import '../web-grid'
+import '../web-grid/web-grid'
 
 const GameOfLife = props => {
   const { initialWorld, tick, active } = props

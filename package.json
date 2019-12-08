@@ -1,13 +1,12 @@
 {
-	"name": "atomicowc",
-	"description": "",
-	"version": "0.0.0",
-	"main": "lib/index.js",
+	"name": "atomico-game-of-life",
+	"description": "Conway's Game of Life with Atomico",
+	"version": "1.0.0",
 	"source": "index.html",
 	"scripts": {
-		"build": "rollup -c",
-		"server": "servor dist",
-		"dev": "rollup -c -w",
+		"build": "bundle index.html dist",
+		"build:web-components": "bundle src/web-components/**/*-*.js web-components --external",
+		"dev": "bundle index.html dist --watch --server",
 		"prepare": "npm run build"
 	},
 	"dependencies": {
@@ -15,12 +14,6 @@
 		"rxjs": "^6.5.3"
 	},
 	"devDependencies": {
-		"@atomico/rollup-pack": "^0.1.9",
-		"@atomico/rollup-plugin-import-css": "^1.0.3",
-		"@babel/preset-react": "^7.0.0",
-		"@babel/core": "^7.7.4",
-		"rollup": "^1.12.4",
-		"rollup-plugin-babel": "^4.3.2",
-		"servor": "^2.2.1"
+		"bundle-cli": "^0.6.2"
 	}
 }

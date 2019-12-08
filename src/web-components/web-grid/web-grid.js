@@ -1,5 +1,5 @@
 import { h, customElement } from 'atomico'
-import '../web-cell'
+import '../web-cell/web-cell'
 
 const WebGrid = props => {
   const { arr, cols, rows } = props.world
