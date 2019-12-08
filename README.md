@@ -21,8 +21,7 @@
 
 ```bash
 npm install # install dependencies
-npm run dev # build and watch for code changes
-npm run server # run dev server at port 8080
+npm run dev # build and watch for code changes and open the localserver: 8080
 ```
 
 ## Component's logics
@@ -42,12 +41,12 @@ The description of Conway's Game Of Life: [https://en.wikipedia.org/wiki/Conway%
 
 A good source introducing Reactive Programming/RxJs/Game Of Life: [https://docs.google.com/presentation/d/e/2PACX-1vQ06TaoEe3o9Xu7FluNigjqaKwXreoPj4xYgZ-ZCAw4cXlMSPpEqAH0re11eP2_uzw7N_hpEZ33gWsG/pub?start=false&loop=false&delayms=3000&slide=id.g34fa86e976_0_0]
 
-**TBD**
+_TBD_
 
 ## Takeaways
 **How RxJS works with Atomico**
 
-**TBD: more details**
+_TBD: more details_
 
 ## What's next
 Improve `<game-of-life>` from some aspects.  It's nice to add a web component playing "control panel" role, which allows user to change tick's duration, to apply initial world pattern from predefined list of famous patterns.
