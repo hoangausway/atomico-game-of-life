@@ -6,22 +6,13 @@ import '../web-grid/web-grid'
 const GameOfLife = props => {
   const { initialWorld, tick, active } = props
 
-  const resetEvent = {
-    world_event_reset: {
-      world: initialWorld,
-      tick: tick
-    }
-  }
-
-  const pauseEvent = () => new window.CustomEvent('pause')
-
   // states: world
   const [world, setWorld] = useState(initialWorld)
 
   // observers which will update states
   const worldObserver = setWorld
   const pauseObserver = paused => console.log(`Is paused? ${!paused}`)
-  const resetObserver = e => console.log('RESET')
+  const resetObserver = e => console.log('RESET - observed')
 
   /*
     wrapper of business logics of the game of life
@@ -31,20 +22,29 @@ const GameOfLife = props => {
   const [resetEmit, pauseEmit, toggleEmit] = useEventOfLife(
     [worldObserver, pauseObserver, resetObserver],
     initialWorld,
-    resetEvent
+    tick
   )
 
   useEffect(
     () => {
-      if (initialWorld) {
+      if (initialWorld !== null && tick !== null) {
         setWorld(initialWorld)
-        resetEmit(resetEvent)
+        resetEmit(
+          new window.CustomEvent('reset', {
+            detail: { tick, world: initialWorld }
+          })
+        )
       }
     },
     [initialWorld, tick]
   )
 
-  useEffect(() => pauseEmit(pauseEvent()), [active])
+  useEffect(
+    () => {
+      if (active !== null) pauseEmit(new window.CustomEvent('pause'))
+    },
+    [active]
+  )
 
   return (
     <host shadowDom ontogglecell={toggleEmit}>
@@ -54,14 +54,24 @@ const GameOfLife = props => {
 }
 
 GameOfLife.props = {
-  initialWorld: Object,
+  initialWorld: {
+    type: Object,
+    get value () {
+      return { arr: [false], cols: 1, rows: 1 }
+    }
+  },
   tick: {
     type: Number,
     get value () {
       return 1000
     }
   },
-  active: Boolean
+  active: {
+    type: Boolean,
+    get value () {
+      return false
+    }
+  }
 }
 
 export default customElement('game-of-life', GameOfLife)

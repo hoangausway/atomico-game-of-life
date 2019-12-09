@@ -134,7 +134,6 @@
         /* RESET initialWorld */
         const btnReset = document.getElementById("btn-reset");
         btnReset.addEventListener("click", e => {
-          console.log("RESET")
           // reset the game in 0.5 seconds
           gameOfLife.initialWorld = null;
           setTimeout(function(){ gameOfLife.initialWorld = initialWorld; }, 500);

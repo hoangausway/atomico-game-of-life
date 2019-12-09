@@ -1,7 +1,3 @@
-import { merge, interval } from 'rxjs'
-// eslint-disable-next-line
-import { map, scan, filter, switchMap, tap } from 'rxjs/operators'
-
 /*
   Streams Of Life:
   pause$
@@ -9,62 +5,50 @@ import { map, scan, filter, switchMap, tap } from 'rxjs/operators'
   tick$
 */
 
-// event type constants
-const WORLD_EVENT_RESET = 1
-const WORLD_EVENT_ACTIVATE = 2
-const WORLD_EVENT_TOGGLE = 3
-const WORLD_EVENT_TICK = 4
+/*
+  Rules: In a grid, a cell may be live or dead (black or white).
+  Grid is started with some live cells and then be evolving over time (ticks).
+  At each moment, each cell is examined to change it's status.
+  Depends on it's current status and it's neighbours' statuses the examined cell
+  may stay at current status or move to new status.
+  Examine a cell, let's call N as number of live neighbours (8 of them)
+  - If N = 2, examined cell stay as dead or live
+  - If N = 3, examined cell should move to live
+  - Else (N < 2 or N > 3), examined cell should move to dead
 
-export const WorldEventTypes = {
-  RESET: WORLD_EVENT_RESET,
-  ACTIVATE: WORLD_EVENT_ACTIVATE,
-  TOGGLE: WORLD_EVENT_TOGGLE
+  API of logics:
+  - updateWorld(world)
+  - toggleCell(world, x, y)
+  - drawPattern(rows, cols, pattern)
+*/
+/* return new world with updated state of all cells based on the previous state of the world */
+export function updateWorld (world) {
+  const { arr, rows, cols } = world
+
+  /* make a copy of world to modify */
+  const newArr = arr.slice()
+
+  /* update each cell */
+  let x, y
+  for (y = 0; y < rows; y++) {
+    for (x = 0; x < cols; x++) {
+      newArr[y * cols + x] = updateCellState(x, y, world)
+    }
+  }
+
+  return { arr: newArr, rows, cols }
 }
 
-// return stream of world events
-export const makeWorldStream = (initialWorld, pause$, toggle$, reset$) => {
-  const tick$ = reset$
-    .pipe(switchMap(e => interval(e.world_event_reset.tick)))
-    .pipe(map(e => ({ world_event_type: WORLD_EVENT_TICK })))
+/*
+  return the world with the (x, y) cell state toggled
+*/
+export function toggleCell (world, x, y) {
+  const { arr, rows, cols } = world
 
-  const update$ = merge(reset$, toggle$, pause$, tick$).pipe(
-    scan(
-      (prev, e) => ({
-        ...e,
-        active:
-          e.world_event_type === WORLD_EVENT_ACTIVATE
-            ? !prev.active
-            : prev.active
-      }),
-      { active: true }
-    ),
-
-    filter(
-      e =>
-        e.world_event_type === WORLD_EVENT_TOGGLE ||
-        e.world_event_type === WORLD_EVENT_RESET ||
-        (e.world_event_type === WORLD_EVENT_TICK && e.active)
-    )
-  )
-
-  const updateWorldFunc$ = update$.pipe(
-    map(e => {
-      switch (e.world_event_type) {
-        case WORLD_EVENT_TICK:
-          return world => updateWorld(world)
-        case WORLD_EVENT_TOGGLE: {
-          const [col, row] = e.world_event_cell
-          return world => toggleCell(world, col, row)
-        }
-        case WORLD_EVENT_RESET: {
-          return world => updateWorld(e.world_event_reset.world)
-        }
-        default:
-      }
-    })
-  )
-
-  return updateWorldFunc$.pipe(scan((world, f) => f(world), initialWorld))
+  /* make a copy of world to modify */
+  const newArr = arr.slice()
+  newArr[y * cols + x] = !arr[y * cols + x]
+  return { arr: newArr, rows, cols }
 }
 
 /* draw the named pattern in the world at (col0, row0) */
@@ -88,50 +72,9 @@ export function drawPattern (rows, cols, pattern) {
   return { arr, rows, cols }
 }
 
-/* Helpers - Rules */
 /*
-  Rules: In a grid, a cell may be live or dead (black or white).
-  Grid is started with some live cells and then be evolving over time (ticks).
-  At each moment, each cell is examined to change it's status.
-  Depends on it's current status and it's neighbours' statuses the examined cell
-  may stay at current status or move to new status.
-  Examine a cell, let's call N as number of live neighbours (8 of them)
-  - If N = 2, examined cell stay as dead or live
-  - If N = 3, examined cell should move to live
-  - Else (N < 2 or N > 3), examined cell should move to dead
-
-  API of logics:
-  - updateWorld(world)
-  - toggleCell(world, x, y)
-  - drawPattern(rows, cols, pattern)
+  Helpers - Rules
 */
-/* return new world with updated state of all cells based on the previous state of the world */
-function updateWorld (world) {
-  const { arr, rows, cols } = world
-
-  /* make a copy of world to modify */
-  const newArr = arr.slice()
-
-  /* update each cell */
-  let x, y
-  for (y = 0; y < rows; y++) {
-    for (x = 0; x < cols; x++) {
-      newArr[y * cols + x] = updateCellState(x, y, world)
-    }
-  }
-
-  return { arr: newArr, rows, cols }
-}
-
-/* return the world with the (x, y) cell state toggled */
-function toggleCell (world, x, y) {
-  const { arr, rows, cols } = world
-
-  /* make a copy of world to modify */
-  const newArr = arr.slice()
-  newArr[y * cols + x] = !arr[y * cols + x]
-  return { arr: newArr, rows, cols }
-}
 
 /* check whether the cell at these indices exists and is alive */
 function isAlive (x, y, world) {
