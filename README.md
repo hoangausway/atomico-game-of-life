@@ -44,7 +44,71 @@ A good source introducing Reactive Programming/RxJs/Game Of Life: [https://docs.
 ## Takeaways
 **How RxJS works with Atomico**
 
-_TBD: more details_
+**Engage DOM event with RxJS stream using Atomico useMemo/useCallback**
+```bash
+/src/web-components/game-of-life/useEventStream.js
+
+import { useMemo } from 'atomico'
+import { Subject } from 'rxjs'
+
+export const useEventStream = (dependencies = []) => {
+  const eventStream$ = useMemo(() => new Subject(), dependencies)
+  const eventEmit = e => eventStream$.next(e)
+  # useCallback maybe OK here:
+  # const eventEmit = useCallback(e => eventStream$.next(e), dependencies)
+  # at the writing moment the useCallback not available yet.
+  return [eventEmit, eventStream$]
+}
+```
+
+Usage of useEventStream:
+
+```bash
+/src/web-components/game-of-life/useEventOfLife.js
+
+...
+# define event streams and related triggers
+const [toggleEmit, toggleEvent$] = useEventStream()
+const [pauseEmit, pauseEvent$] = useEventStream()
+const [resetEmit, resetEvent$] = useEventStream()
+...
+# manipulating pauseEvent$ stream
+const pause$ = pauseEvent$.pipe(
+  map(e => ({ ...e, world_event_type: WorldEventTypes.ACTIVATE }))
+)
+
+...
+```
+**Emit stream within useEffect**
+```bash
+/src/web-components/game-of-life/game-of-life.js
+...
+# emits `pause` event using `pauseEmit`
+useEffect(
+  () => {
+    pauseEmit(new window.CustomEvent('pause'))
+  },
+  [active]
+)
+```
+**Subscribe/unsubscribe stream within useEffect**
+```bash
+/src/web-components/game-of-life/useEventOfLife.js
+...
+useEffect(() => {
+  ...
+  const pauseSub = pauseStream$.subscribe(pauseObserver)
+
+  return () => {
+    ...
+    pauseSub.unsubscribe()
+  }
+  // eslint-disable-next-line
+}, [])
+```
+
+
+
 
 ## What's next
 Improve `<game-of-life>` from some aspects.  It's nice to add a web component playing "control panel" role, which allows user to change tick's duration, to apply initial world pattern from predefined list of famous patterns.
