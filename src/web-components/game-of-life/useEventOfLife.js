@@ -7,6 +7,18 @@ import { merge, interval } from 'rxjs'
 import { updateWorld, toggleCell } from './rulesOfLife'
 import { useEventStream } from './useEventStream'
 
+// event type constants
+const WORLD_EVENT_RESET = 1
+const WORLD_EVENT_ACTIVATE = 2
+const WORLD_EVENT_TOGGLE = 3
+const WORLD_EVENT_TICK = 4
+
+const WorldEventTypes = {
+  RESET: WORLD_EVENT_RESET,
+  ACTIVATE: WORLD_EVENT_ACTIVATE,
+  TOGGLE: WORLD_EVENT_TOGGLE
+}
+
 /*
 INPUT
   observers:
@@ -52,19 +64,23 @@ const useEventOfLife = (observers, initialWorld, initialTick) => {
     map(e => ({ ...e, world_event_type: WorldEventTypes.ACTIVATE }))
   )
 
-  // make combined stream of events which change the world state
+  const tick$ = reset$
+    .pipe(switchMap(e => interval(initialTick)))
+    .pipe(map(e => ({ world_event_type: WORLD_EVENT_TICK })))
+
+  // make world stream which evolves from initial world state
   const worldStream$ = makeWorldStream(
     initialWorld,
-    initialTick,
-    toggle$,
+    tick$,
     pause$,
+    toggle$,
     reset$
   )
 
-  // optional: transform the pauseStream.
-  // It's observer can track paused value and respond if needed.
+  // [optional]: transform the pauseStream for tracking and responding paused value if needed
   const pauseStream$ = pauseEvent$.pipe(scan((paused, event) => !paused, true))
 
+  // subscribe and unsubscribe streams accordingly
   useEffect(() => {
     const worldSub = worldStream$.subscribe(worldObserver)
     const pauseSub = pauseStream$.subscribe(pauseObserver)
@@ -84,31 +100,11 @@ const useEventOfLife = (observers, initialWorld, initialTick) => {
 export default useEventOfLife
 
 // Helpers
-// return stream of world events
-// event type constants
-const WORLD_EVENT_RESET = 1
-const WORLD_EVENT_ACTIVATE = 2
-const WORLD_EVENT_TOGGLE = 3
-const WORLD_EVENT_TICK = 4
 
-export const WorldEventTypes = {
-  RESET: WORLD_EVENT_RESET,
-  ACTIVATE: WORLD_EVENT_ACTIVATE,
-  TOGGLE: WORLD_EVENT_TOGGLE
-}
-
-const makeWorldStream = (
-  initialWorld,
-  initialTick,
-  pause$,
-  toggle$,
-  reset$
-) => {
-  const tick$ = reset$
-    .pipe(switchMap(e => interval(initialTick)))
-    .pipe(map(e => ({ world_event_type: WORLD_EVENT_TICK })))
-
+// make world state stream which evolves world from intitialWorld
+const makeWorldStream = (initialWorld, tick$, pause$, toggle$, reset$) => {
   const update$ = merge(reset$, toggle$, pause$, tick$).pipe(
+    // add property 'active' to combined stream
     scan(
       (prev, e) => ({
         ...e,
@@ -119,7 +115,7 @@ const makeWorldStream = (
       }),
       { active: true }
     ),
-
+    // pick only interesting event types and if 'active' is true
     filter(
       e =>
         e.world_event_type === WORLD_EVENT_TOGGLE ||
@@ -128,7 +124,9 @@ const makeWorldStream = (
     )
   )
 
-  const updateWorldFunc$ = update$.pipe(
+  // make a stream of functions which reflect events affecting the world state
+  // resulting function signature is f: world => world
+  const func$ = update$.pipe(
     map(e => {
       switch (e.world_event_type) {
         case WORLD_EVENT_TICK:
@@ -145,5 +143,6 @@ const makeWorldStream = (
     })
   )
 
-  return updateWorldFunc$.pipe(scan((world, f) => f(world), initialWorld))
+  const scanner = (world, f) => f(world)
+  return func$.pipe(scan(scanner, initialWorld))
 }
