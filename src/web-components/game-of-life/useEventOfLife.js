@@ -32,7 +32,7 @@ const useEventOfLife = (observers, initialWorld, initialResetEvent) => {
     map(e => ({
       ...e,
       world_event_type: WorldEventTypes.RESET,
-      world_event_reset: e.world_event_reset
+      world_event_reset: e.world_reset_data
     })),
     startWith(initialResetEvent)
   )
@@ -40,7 +40,7 @@ const useEventOfLife = (observers, initialWorld, initialResetEvent) => {
     map(e => ({
       ...e,
       world_event_type: WorldEventTypes.TOGGLE,
-      world_event_cell: [parseInt(e.detail.col), parseInt(e.detail.row)]
+      world_toggle_cell: [parseInt(e.detail.col), parseInt(e.detail.row)]
     }))
   )
   const pause$ = pauseEvent$.pipe(

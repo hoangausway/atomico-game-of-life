@@ -7,7 +7,7 @@ const GameOfLife = props => {
   const { initialWorld, tick, active } = props
 
   const resetEvent = {
-    world_event_reset: {
+    world_reset_data: {
       world: initialWorld,
       tick: tick
     }
