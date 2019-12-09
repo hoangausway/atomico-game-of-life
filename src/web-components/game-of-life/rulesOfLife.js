@@ -24,7 +24,7 @@ export const WorldEventTypes = {
 // return stream of world events
 export const makeWorldStream = (initialWorld, pause$, toggle$, reset$) => {
   const tick$ = reset$
-    .pipe(switchMap(e => interval(e.world_reset_data.tick)))
+    .pipe(switchMap(e => interval(e.world_event_reset.tick)))
     .pipe(map(e => ({ world_event_type: WORLD_EVENT_TICK })))
 
   const update$ = merge(reset$, toggle$, pause$, tick$).pipe(
@@ -53,11 +53,11 @@ export const makeWorldStream = (initialWorld, pause$, toggle$, reset$) => {
         case WORLD_EVENT_TICK:
           return world => updateWorld(world)
         case WORLD_EVENT_TOGGLE: {
-          const [col, row] = e.world_toggle_cell
+          const [col, row] = e.world_event_cell
           return world => toggleCell(world, col, row)
         }
         case WORLD_EVENT_RESET: {
-          return world => updateWorld(e.world_reset_data.world)
+          return world => updateWorld(e.world_event_reset.world)
         }
         default:
       }
