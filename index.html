@@ -118,7 +118,6 @@
         const initialWorld = drawPattern(40, 40, pattern);
         const gameOfLife = document.getElementById("game-of-life-40");
         gameOfLife.initialWorld = initialWorld;        
-        gameOfLife.tick = 1000;
         // start the game in 0.5 secnds
         setTimeout(function(){ gameOfLife.active = true; }, 500);
 

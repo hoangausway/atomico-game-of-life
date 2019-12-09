@@ -13,13 +13,15 @@ const GameOfLife = props => {
     }
   }
 
-  const pauseEvent = () => new window.CustomEvent('pause')
+  const togglePauseEvent = new window.CustomEvent('togglepause')
 
   // states: world
   const [world, setWorld] = useState(initialWorld)
 
-  // observers which will update states
+  // observer which will update world state
   const worldObserver = setWorld
+
+  // [optional] observers tracking events 'reset' and 'pause'
   const pauseObserver = paused => console.log(`Is paused? ${!paused}`)
   const resetObserver = e => console.log('RESET')
 
@@ -34,17 +36,24 @@ const GameOfLife = props => {
     resetEvent
   )
 
+  // whenever 'initialWorld' or 'tick' props changed, emit resetEvent
   useEffect(
     () => {
-      if (initialWorld) {
+      if (initialWorld !== undefined) {
         setWorld(initialWorld)
         resetEmit(resetEvent)
       }
     },
-    [initialWorld]
+    [initialWorld, tick]
   )
 
-  useEffect(() => pauseEmit(pauseEvent()), [active])
+  // whenever 'active' prop changed, emit togglePauseEvent
+  useEffect(
+    () => {
+      pauseEmit(togglePauseEvent)
+    },
+    [active]
+  )
 
   return (
     <host shadowDom ontogglecell={toggleEmit}>
