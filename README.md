@@ -41,8 +41,6 @@ The description of Conway's Game Of Life: [https://en.wikipedia.org/wiki/Conway%
 
 A good source introducing Reactive Programming/RxJs/Game Of Life: [https://docs.google.com/presentation/d/e/2PACX-1vQ06TaoEe3o9Xu7FluNigjqaKwXreoPj4xYgZ-ZCAw4cXlMSPpEqAH0re11eP2_uzw7N_hpEZ33gWsG/pub?start=false&loop=false&delayms=3000&slide=id.g34fa86e976_0_0]
 
-_TBD_
-
 ## Takeaways
 **How RxJS works with Atomico**
 

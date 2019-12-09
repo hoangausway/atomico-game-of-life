@@ -3,11 +3,11 @@ import { Subject } from 'rxjs'
 
 /*
   returns
-  eventEmit: emit stream triggered by a DOM/Custom event
+  eventEmit: emits stream triggered by a DOM/Custom event
   eventStream$: emitted stream
 */
-export const useEventStream = () => {
-  const eventStream$ = useMemo(() => new Subject(), [])
+export const useEventStream = (dependencies = []) => {
+  const eventStream$ = useMemo(() => new Subject(), dependencies)
   const eventEmit = e => eventStream$.next(e) // useCallback maybe OK here
   return [eventEmit, eventStream$]
 }
