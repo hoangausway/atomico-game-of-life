@@ -65,7 +65,8 @@ Usage of useEventStream:
 
 ```bash
 /src/web-components/game-of-life/useEventOfLife.js
-
+import { useEventStream } from './useEventStream'
+import { map } from 'rxjs/operators'
 ...
 # define event streams and related triggers
 const [toggleEmit, toggleEvent$] = useEventStream()
@@ -82,6 +83,7 @@ const pause$ = pauseEvent$.pipe(
 **Emit stream within useEffect**
 ```bash
 /src/web-components/game-of-life/game-of-life.js
+import { useEffect } from 'atomico'
 ...
 # emits `pause` event using `pauseEmit`
 useEffect(
@@ -94,20 +96,17 @@ useEffect(
 **Subscribe/unsubscribe stream within useEffect**
 ```bash
 /src/web-components/game-of-life/useEventOfLife.js
+import { useEffect } from 'atomico'
 ...
 useEffect(() => {
   ...
   const pauseSub = pauseStream$.subscribe(pauseObserver)
-
   return () => {
     ...
     pauseSub.unsubscribe()
   }
-  // eslint-disable-next-line
 }, [])
 ```
-
-
 
 
 ## What's next
