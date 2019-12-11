@@ -13,11 +13,11 @@
 
 For basic cases please see:
 
-- [<web-cell>:  Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-cell)
+- [`<web-cell>`:  Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-cell)
 
-- [<web-grid>: Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-grid)
+- [`<web-grid>`: Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-grid)
 
-- [<random-flip>: A simple "game" exploring web components web-cell and web-grid](https://github.com/hoangausway/atomico-random-flip)
+- [`<random-flip>`: A simple "game" exploring web components web-cell and web-grid](https://github.com/hoangausway/atomico-random-flip)
 
 ## Source - Build - Run
 
