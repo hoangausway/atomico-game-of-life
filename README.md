@@ -12,11 +12,12 @@
 - Taste Functional Reactive Programming (RxJS) with Atomico
 
 For basic cases please see:
-[Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-cell)
 
-[Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-grid)
+- [Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-cell)
 
-[A simple "game" exploring web components web-cell and web-grid](https://github.com/hoangausway/atomico-random-flip)
+- [Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-grid)
+
+- [A simple "game" exploring web components web-cell and web-grid](https://github.com/hoangausway/atomico-random-flip)
 
 ## Source - Build - Run
 
