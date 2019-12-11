@@ -11,7 +11,7 @@
 - Using dispatch mechanism to raise event from web component to outside world
 - Taste Functional Reactive Programming (RxJS) with Atomico
 
-For basic cases please see:
+For basic examples please see:
 
 - [`<web-cell>`:  Simple web component example using Atomico](https://github.com/hoangausway/atomico-simple-web-cell)
 
