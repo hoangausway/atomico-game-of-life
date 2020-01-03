@@ -11,7 +11,7 @@ const GameOfLife = props => {
 
   // observers which will update states
   const worldObserver = setWorld
-  const pauseObserver = paused => console.log(`Is paused? ${!paused}`)
+  const activeObserver = active => console.log(`Is paused? ${!active}`)
   const resetObserver = e => console.log('RESET - observed')
 
   /*
@@ -19,15 +19,15 @@ const GameOfLife = props => {
     return a set of handlers/emitter which can be used to raise/trigger events
     from inside the wrapper, the observers will be called as events happen
   */
-  const [resetEmit, pauseEmit, toggleEmit] = useEventOfLife(
-    [worldObserver, pauseObserver, resetObserver],
+  const [resetEmit, activeEmit, toggleEmit] = useEventOfLife(
+    [worldObserver, activeObserver, resetObserver],
     initialWorld,
     tick
   )
 
   useEffect(
     () => {
-      if (initialWorld !== null && tick !== null) {
+      if (initialWorld && tick) {
         setWorld(initialWorld)
         resetEmit(
           new window.CustomEvent('reset', {
@@ -41,7 +41,7 @@ const GameOfLife = props => {
 
   useEffect(
     () => {
-      if (active !== null) pauseEmit(new window.CustomEvent('pause'))
+      activeEmit(new window.CustomEvent('active_toggle'))
     },
     [active]
   )
@@ -57,7 +57,7 @@ GameOfLife.props = {
   initialWorld: {
     type: Object,
     get value () {
-      return { arr: [false], cols: 1, rows: 1 }
+      return null
     }
   },
   tick: {

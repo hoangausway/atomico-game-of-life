@@ -23,21 +23,21 @@ const WorldEventTypes = {
 INPUT
   observers:
   - worldObserver to observe combination of events: 'tick', 'toggle cell', and 'paused'
-  - pauseObserver to observe event of 'paused' value
+  - activeObserver to observe event of 'paused' value
   initialWorld: initial world state
   initialResetEvent: initial reset event
 OUPUT
   handlers:
-  - pauseEmit: triggers emitting of 'paused' event
+  - activeEmit: triggers emitting of 'paused' event
   - toggleEmit: trigggers emitting of 'toggle cell' event
   - resetEmit: tigggers emitting of 'reset' event
 */
 const useEventOfLife = (observers, initialWorld, initialTick) => {
-  const [worldObserver, pauseObserver, resetObserver] = observers
+  const [worldObserver, activeObserver, resetObserver] = observers
 
   // define event streams and related triggers
   const [toggleEmit, toggleEvent$] = useEventStream()
-  const [pauseEmit, pauseEvent$] = useEventStream()
+  const [activeEmit, activeEvent$] = useEventStream()
   const [resetEmit, resetEvent$] = useEventStream()
 
   // preprocess streams
@@ -46,12 +46,7 @@ const useEventOfLife = (observers, initialWorld, initialTick) => {
       ...e,
       world_event_type: WorldEventTypes.RESET,
       world_event_reset: e.detail
-    })),
-    startWith(
-      new window.CustomEvent('reset', {
-        detail: { tick: initialTick, world: initialWorld }
-      })
-    )
+    }))
   )
   const toggle$ = toggleEvent$.pipe(
     map(e => ({
@@ -60,7 +55,7 @@ const useEventOfLife = (observers, initialWorld, initialTick) => {
       world_event_cell: [parseInt(e.detail.col), parseInt(e.detail.row)]
     }))
   )
-  const pause$ = pauseEvent$.pipe(
+  const active$ = activeEvent$.pipe(
     map(e => ({ ...e, world_event_type: WorldEventTypes.ACTIVATE }))
   )
 
@@ -72,29 +67,31 @@ const useEventOfLife = (observers, initialWorld, initialTick) => {
   const worldStream$ = makeWorldStream(
     initialWorld,
     tick$,
-    pause$,
+    active$,
     toggle$,
     reset$
   )
 
-  // [optional]: transform the pauseStream for tracking and responding paused value if needed
-  const pauseStream$ = pauseEvent$.pipe(scan((paused, event) => !paused, true))
+  // [optional]: transform the activeStream$ for tracking and responding paused value if needed
+  const activeStream$ = activeEvent$.pipe(
+    scan((active, event) => !active, false)
+  )
 
   // subscribe and unsubscribe streams accordingly
   useEffect(() => {
     const worldSub = worldStream$.subscribe(worldObserver)
-    const pauseSub = pauseStream$.subscribe(pauseObserver)
+    const activeSub = activeStream$.subscribe(activeObserver)
     const resetSub = reset$.subscribe(resetObserver)
 
     return () => {
       worldSub.unsubscribe()
-      pauseSub.unsubscribe()
+      activeSub.unsubscribe()
       resetSub.unsubscribe()
     }
     // eslint-disable-next-line
   }, [])
 
-  return [resetEmit, pauseEmit, toggleEmit]
+  return [resetEmit, activeEmit, toggleEmit]
 }
 
 export default useEventOfLife
@@ -102,8 +99,8 @@ export default useEventOfLife
 // Helpers
 
 // make world state stream which evolves world from intitialWorld
-const makeWorldStream = (initialWorld, tick$, pause$, toggle$, reset$) => {
-  const update$ = merge(reset$, toggle$, pause$, tick$).pipe(
+const makeWorldStream = (initialWorld, tick$, active$, toggle$, reset$) => {
+  const update$ = merge(reset$, toggle$, active$, tick$).pipe(
     // add property 'active' to combined stream
     scan(
       (prev, e) => ({
@@ -113,7 +110,7 @@ const makeWorldStream = (initialWorld, tick$, pause$, toggle$, reset$) => {
             ? !prev.active
             : prev.active
       }),
-      { active: true }
+      { active: false } // start with active = false
     ),
     // pick only interesting event types and if 'active' is true
     filter(

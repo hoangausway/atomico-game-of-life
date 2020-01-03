@@ -1,10 +1,12 @@
-<!DOCTYPE html><html lang="en"><head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title></title>
-  <meta name="description" content="">
-  <style>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <style>
       html,
       body {
         width: 100%;
@@ -85,20 +87,20 @@
 
           return { arr, rows, cols };
         }
-        function makePattern(patternName, originX, originY) {
-          return { matrix: patterns[patternName], originX, originY };
-        }
+        // function makePattern(patternName, originX, originY) {
+        //   return { matrix: patterns[patternName], originX, originY };
+        // }
         const patterns = {
           // oscillators
           BLINKER: [
             [0, 0, 0],
             [1, 1, 1],
-            [0, 0, 0],
+            [0, 0, 0]
           ],
 
           TOAD: [
             [0, 1, 1, 1],
-            [1, 1, 1, 0],
+            [1, 1, 1, 0]
           ],
           QUEEN_BEE_SHUTTLE: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -107,28 +109,24 @@
             [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          ],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          ]
         };
         const pattern = {
           matrix: patterns["QUEEN_BEE_SHUTTLE"],
           originX: 5,
-          originY: 5,
+          originY: 5
         };
         const initialWorld = drawPattern(40, 40, pattern);
         const gameOfLife = document.getElementById("game-of-life-40");
-        gameOfLife.initialWorld = initialWorld;        
-        // start the game in 0.5 secnds
-        setTimeout(function(){ gameOfLife.active = true; }, 500);
-
+        gameOfLife.initialWorld = initialWorld;
 
         /* PAUSE/ACTIVATE */
         const btnPause = document.getElementById("btn-toggle-pause");
         btnPause.addEventListener("click", e => {
-          const isPaused = btnPause.classList.toggle("paused");
-          btnPause.textContent = isPaused ? "CONTINUE" : "PAUSE";
-          console.log(btnPause.textContent)
-          gameOfLife.active = !isPaused;
+          const ispaused = btnPause.classList.toggle("paused");
+          btnPause.textContent = ispaused ? "CONTINUE" : "PAUSE";
+          gameOfLife.active = ispaused;
         });
 
         /* RESET initialWorld */
@@ -136,7 +134,9 @@
         btnReset.addEventListener("click", e => {
           // reset the game in 0.5 seconds
           gameOfLife.initialWorld = null;
-          setTimeout(function(){ gameOfLife.initialWorld = initialWorld; }, 500);
+          setTimeout(function() {
+            gameOfLife.initialWorld = initialWorld;
+          }, 500);
         });
       };
     </script>
@@ -148,11 +148,25 @@
       <game-of-life id="game-of-life-40"></game-of-life>
     </div>
     <div class="note">
-      <p><b>&lt;game-of-live&gt;</b>: After each tick, cells become dead or alive.</p>
+      <p>
+        <b>&lt;game-of-live&gt;</b>: After each tick, cells become dead or
+        alive.
+      </p>
       <p>Click on the cells will change the course of evolution</p>
-        <p><b>Note:</b> The game was started with famous pattern named "Queen Bee Shuttle".</p>
-        <p>A comprehensive list of patterns can be found in file patterns.js from source codes.</p>
-        <p>Game description: <a href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life">Conway's Game Of Life</a></p>
+      <p>
+        <b>Note:</b> The game was started with famous pattern named "Queen Bee
+        Shuttle".
+      </p>
+      <p>
+        A comprehensive list of patterns can be found in file patterns.js from
+        source codes.
+      </p>
+      <p>
+        Game description:
+        <a href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life"
+          >Conway's Game Of Life</a
+        >
+      </p>
     </div>
 
     <!-- <script type="module" src="./src/index.js"></script> -->
