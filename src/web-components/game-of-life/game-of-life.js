@@ -14,6 +14,7 @@ const GameOfLife = props => {
 
   // working streams
   const { world$, activate$, reset$, emitters } = streamsOfLife({
+    active,
     tick,
     initialWorld
   })
@@ -22,7 +23,7 @@ const GameOfLife = props => {
   useEffect(() => {
     const worldSub = world$.subscribe(setWorld)
     const activeSub = activate$.subscribe(active =>
-      console.log(`Active? ${!active}`)
+      console.log(`Active? ${active}`)
     )
     const resetSub = reset$.subscribe(e => console.log('RESET - observed'))
 

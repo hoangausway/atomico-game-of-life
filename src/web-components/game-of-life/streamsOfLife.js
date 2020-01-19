@@ -1,3 +1,7 @@
+/*
+  Implement app's logics by transforming the state streams provided by 'Stream Store'.
+*/
+
 // eslint-disable-next-line
 import { filter, map, scan, startWith, switchMap, tap } from 'rxjs/operators'
 import { merge } from 'rxjs'
@@ -65,7 +69,7 @@ const streamsOfLife = props => {
 
   // transform the active stream for tracking and responding paused value if needed
   const activate$ = streams[eventTypes.ACTIVATE].pipe(
-    scan((active, event) => !active, false)
+    scan((active, event) => !active, props.active)
   )
 
   const reset$ = streams[eventTypes.RESET]
