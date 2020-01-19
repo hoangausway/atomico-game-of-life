@@ -9,8 +9,13 @@ import { merge } from 'rxjs'
 import { updateWorld, toggleCell } from './rulesOfLife'
 import { eventTypes, makeStreamStore } from './streamStore'
 
-// make world state stream which evolves world from intitialWorld
-const worldFunc$ = streams => {
+// make stream of functions which evolve world
+const worldFunc$ = (streams, active) => {
+  const activeScanner = (prev, e) => ({
+    ...e,
+    active: e.event_type === eventTypes.ACTIVATE ? !prev.active : prev.active
+  })
+
   const update$ = merge(
     streams[eventTypes.RESET],
     streams[eventTypes.TOGGLE],
@@ -18,14 +23,7 @@ const worldFunc$ = streams => {
     streams[eventTypes.TICK]
   ).pipe(
     // add property 'active' to combined stream
-    scan(
-      (prev, e) => ({
-        ...e,
-        active:
-          e.event_type === eventTypes.ACTIVATE ? !prev.active : prev.active
-      }),
-      { active: false } // start with active = false
-    ),
+    scan(activeScanner, { active }),
     // pick only interesting event types and if 'active' is true
     filter(
       e =>
@@ -37,7 +35,7 @@ const worldFunc$ = streams => {
 
   // make a stream of functions which reflect events affecting the world state
   // resulting function signature is f: world => world
-  const func$ = update$.pipe(
+  const worldFunc$ = update$.pipe(
     map(e => {
       switch (e.event_type) {
         case eventTypes.TICK:
@@ -55,21 +53,23 @@ const worldFunc$ = streams => {
     })
   )
 
-  return func$
+  return worldFunc$
 }
 
 const streamsOfLife = props => {
+  const { tick, active, initialWorld } = props
+
   // transfrom streams as game's business requires
-  const { emitters, streams } = makeStreamStore({ tick: props.tick })
+  const { emitters, streams } = makeStreamStore({ tick })
 
   // transform world stream
-  const world$ = worldFunc$(streams).pipe(
-    scan((world, f) => f(world), props.initialWorld)
+  const world$ = worldFunc$(streams, active).pipe(
+    scan((world, f) => f(world), initialWorld)
   )
 
   // transform the active stream for tracking and responding paused value if needed
   const activate$ = streams[eventTypes.ACTIVATE].pipe(
-    scan((active, event) => !active, props.active)
+    scan((active, event) => !active, active)
   )
 
   const reset$ = streams[eventTypes.RESET]

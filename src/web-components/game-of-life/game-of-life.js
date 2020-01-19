@@ -5,14 +5,14 @@ import streamsOfLife from './streamsOfLife'
 const GameOfLife = props => {
   const { initialWorld, tick, active } = props
 
-  // states: world
+  // state: world
   const [world, setWorld] = useState(initialWorld)
   const { arr, cols, rows } = world
 
-  //  states: cellToggle
+  //  state: cellToggle
   const [cellToggle, setCellToggle] = useState(null)
 
-  // working streams
+  // interested streams and emitters
   const { world$, activate$, reset$, emitters } = streamsOfLife({
     active,
     tick,
@@ -46,7 +46,7 @@ const GameOfLife = props => {
 
   // emits 'reset' event
   useEffect(() => {
-    if (initialWorld && tick) {
+    if (initialWorld) {
       setWorld(initialWorld)
       emitters[eventTypes.RESET](
         new window.CustomEvent('reset', {

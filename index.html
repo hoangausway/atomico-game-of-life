@@ -87,9 +87,6 @@
 
           return { arr, rows, cols };
         }
-        // function makePattern(patternName, originX, originY) {
-        //   return { matrix: patterns[patternName], originX, originY };
-        // }
         const patterns = {
           // oscillators
           BLINKER: [
@@ -132,11 +129,10 @@
         /* RESET initialWorld */
         const btnReset = document.getElementById("btn-reset");
         btnReset.addEventListener("click", e => {
-          // reset the game in 0.5 seconds
           gameOfLife.initialWorld = null;
           setTimeout(function() {
             gameOfLife.initialWorld = initialWorld;
-          }, 500);
+          }, 0);
         });
       };
     </script>
@@ -174,13 +170,5 @@
       type="module"
       src="src/web-components/game-of-life/game-of-life.js"
     ></script>
-
-    <!--Delete comment to activate PWA
-		<script>
-			if ("serviceWorker" in navigator) {
-				navigator.serviceWorker.register("sw.js");
-			}
-		</script>
-    -->
   </body>
 </html>
