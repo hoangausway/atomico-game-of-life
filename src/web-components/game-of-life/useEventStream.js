@@ -8,6 +8,6 @@ import { Subject } from 'rxjs'
 */
 export const useEventStream = (dependencies = []) => {
   const eventStream$ = useMemo(() => new Subject(), dependencies)
-  const eventEmit = e => eventStream$.next(e) // useCallback maybe OK here
-  return [eventEmit, eventStream$]
+  const eventEmitter = e => eventStream$.next(e) // useCallback maybe OK here
+  return [eventEmitter, eventStream$]
 }

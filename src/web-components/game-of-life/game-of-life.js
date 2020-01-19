@@ -1,54 +1,81 @@
 import { h, customElement, useState, useEffect } from 'atomico'
-
-import useEventOfLife from './useEventOfLife'
-import '../web-grid/web-grid'
+import { eventTypes } from './streamStore'
+import streamsOfLife from './streamsOfLife'
 
 const GameOfLife = props => {
   const { initialWorld, tick, active } = props
 
   // states: world
   const [world, setWorld] = useState(initialWorld)
+  const { arr, cols, rows } = world
 
-  // observers which will update states
-  const worldObserver = setWorld
-  const activeObserver = active => console.log(`Is paused? ${!active}`)
-  const resetObserver = e => console.log('RESET - observed')
+  //  states: cellToggle
+  const [cellToggle, setCellToggle] = useState(null)
 
-  /*
-    wrapper of business logics of the game of life
-    return a set of handlers/emitter which can be used to raise/trigger events
-    from inside the wrapper, the observers will be called as events happen
-  */
-  const [resetEmit, activeEmit, toggleEmit] = useEventOfLife(
-    [worldObserver, activeObserver, resetObserver],
-    initialWorld,
-    tick
-  )
+  // working streams
+  console.log(tick)
+  const { world$, activate$, reset$, emitters } = streamsOfLife({
+    tick,
+    initialWorld
+  })
 
-  useEffect(
-    () => {
-      if (initialWorld && tick) {
-        setWorld(initialWorld)
-        resetEmit(
-          new window.CustomEvent('reset', {
-            detail: { tick, world: initialWorld }
-          })
-        )
-      }
-    },
-    [initialWorld, tick]
-  )
+  // subscribe and unsubscribe streams accordingly
+  useEffect(() => {
+    const worldSub = world$.subscribe(setWorld)
+    const activeSub = activate$.subscribe(active =>
+      console.log(`Active? ${!active}`)
+    )
+    const resetSub = reset$.subscribe(e => console.log('RESET - observed'))
 
-  useEffect(
-    () => {
-      activeEmit(new window.CustomEvent('active_toggle'))
-    },
-    [active]
-  )
+    return () => {
+      worldSub.unsubscribe()
+      activeSub.unsubscribe()
+      resetSub.unsubscribe()
+    }
+    // eslint-disable-next-line
+  }, [])
+
+  // emits 'cell_toggle' event
+  useEffect(() => {
+    if (cellToggle) {
+      emitters[eventTypes.TOGGLE](
+        new window.CustomEvent('cell_toggle', { detail: cellToggle })
+      )
+    }
+  }, [cellToggle])
+
+  // emits 'reset' event
+  useEffect(() => {
+    if (initialWorld && tick) {
+      setWorld(initialWorld)
+      emitters[eventTypes.RESET](
+        new window.CustomEvent('reset', {
+          detail: { tick, world: initialWorld }
+        })
+      )
+    }
+  }, [initialWorld, tick])
+
+  // emits 'activate' event
+  useEffect(() => {
+    emitters[eventTypes.ACTIVATE](new window.CustomEvent('active_toggle'))
+  }, [active])
 
   return (
-    <host shadowDom ontogglecell={toggleEmit}>
-      <web-grid world={world} />
+    <host shadowDom style={gridStyle(cols, rows)}>
+      {arr.map((alive, idx) => {
+        const row = Math.floor(idx / cols)
+        const col = idx - row * cols
+        return (
+          <div
+            data-col={col}
+            data-row={row}
+            key={idx}
+            style={cellStyle(alive)}
+            onclick={e => setCellToggle(e.target.dataset)}
+          />
+        )
+      })}
     </host>
   )
 }
@@ -57,7 +84,7 @@ GameOfLife.props = {
   initialWorld: {
     type: Object,
     get value () {
-      return null
+      return { arr: [] }
     }
   },
   tick: {
@@ -75,3 +102,27 @@ GameOfLife.props = {
 }
 
 export default customElement('game-of-life', GameOfLife)
+
+// Helpers - CSS
+const gridStyle = (cols, rows) => {
+  return {
+    width: '100%',
+    height: '100%',
+    display: 'grid',
+    'grid-gap': '0px',
+    'grid-template-columns': `repeat(${cols}, 1fr)`,
+    'grid-template-rows': `repeat(${rows}, 1fr)`,
+    border: '1px solid #fafafa'
+  }
+}
+
+const cellStyle = alive => {
+  return {
+    display: 'block',
+    cursor: 'pointer',
+    width: '100%',
+    height: '100%',
+    border: '1px solid gray',
+    background: alive ? 'MidnightBlue' : 'AliceBlue'
+  }
+}

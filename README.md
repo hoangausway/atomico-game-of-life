@@ -22,8 +22,6 @@ For basic examples please see:
 ## Source - Build - Run
 
 - The project structure is based on the **Hello World** example of Atomico author. The component `<hello-world>` is kept for reference in case it's needed.
-- Added `<web-cell>` component.
-- Added `<web-grid>` component.
 - Added `<game-of-life>` component.
 - Commands to install, build, watch and run:
 
