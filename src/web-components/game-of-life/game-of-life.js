@@ -13,7 +13,6 @@ const GameOfLife = props => {
   const [cellToggle, setCellToggle] = useState(null)
 
   // working streams
-  console.log(tick)
   const { world$, activate$, reset$, emitters } = streamsOfLife({
     tick,
     initialWorld

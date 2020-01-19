@@ -75,15 +75,9 @@ import { useEventStream } from './useEventStream'
 import { map } from 'rxjs/operators'
 ...
 # define event streams and related triggers
-const [toggleEmit, toggleEvent$] = useEventStream()
-const [pauseEmit, pauseEvent$] = useEventStream()
-const [resetEmit, resetEvent$] = useEventStream()
-...
-# manipulating pauseEvent$ stream
-const pause$ = pauseEvent$.pipe(
-  map(e => ({ ...e, world_event_type: WorldEventTypes.ACTIVATE }))
-)
-
+const [toggleEmitter, toggleEvent$] = useEventStream()
+const [activateEmitter, activeEvent$] = useEventStream()
+const [resetEmitter, resetEvent$] = useEventStream()
 ...
 ```
 **Emit stream within useEffect**
@@ -91,13 +85,16 @@ const pause$ = pauseEvent$.pipe(
 /src/web-components/game-of-life/game-of-life.js
 import { useEffect } from 'atomico'
 ...
-# emits `pause` event using `pauseEmit`
+# emits `reset` event using `resetEmmiter`
 useEffect(
   () => {
-    pauseEmit(new window.CustomEvent('pause'))
-  },
-  [active]
-)
+    ...
+    resetEmitter(
+        new window.CustomEvent('reset', {
+          detail: { tick, world: initialWorld }
+        })
+      )  
+  }, [tick, initialWorld])
 ```
 **Subscribe/unsubscribe stream within useEffect**
 ```bash
@@ -106,14 +103,13 @@ import { useEffect } from 'atomico'
 ...
 useEffect(() => {
   ...
-  const pauseSub = pauseStream$.subscribe(pauseObserver)
+  const resetSubscriber = reset$.subscribe(e => console.log('RESET - observed'))
   return () => {
     ...
-    pauseSub.unsubscribe()
+    resetSubscriber.unsubscribe()
   }
 }, [])
 ```
-
 
 ## What's next
 Improve `<game-of-life>` from some aspects.  It's nice to add a web component playing "control panel" role, which allows user to change tick's duration, to apply initial world pattern from predefined list of famous patterns.
