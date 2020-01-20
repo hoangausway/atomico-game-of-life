@@ -27,7 +27,7 @@
 
 // eslint-disable-next-line
 import { filter, map, scan, startWith, switchMap, tap } from 'rxjs/operators'
-import { interval } from 'rxjs'
+import { interval, merge } from 'rxjs'
 
 import { useEventStream } from './useEventStream'
 
@@ -52,30 +52,38 @@ export const makeStreamStore = props => {
   emitters[eventTypes.ACTIVATE] = activateEmitter
   emitters[eventTypes.TOGGLE] = toggleEmitter
 
-  // preprocess streams
+  // define and preprocess streams
   const streams = {}
   streams[eventTypes.RESET] = resetEvent$.pipe(
     map(e => ({
-      ...e,
       event_type: eventTypes.RESET,
       event_payload: e.detail
     }))
   )
 
-  streams[eventTypes.ACTIVATE] = activeEvent$.pipe(
-    map(e => ({ ...e, event_type: eventTypes.ACTIVATE }))
-  )
-
   streams[eventTypes.TOGGLE] = toggleEvent$.pipe(
     map(e => ({
-      ...e,
       event_type: eventTypes.TOGGLE,
       event_payload: e.detail
     }))
   )
 
-  streams[eventTypes.TICK] = interval(tick).pipe(
-    map(e => ({ event_type: eventTypes.TICK }))
+  streams[eventTypes.ACTIVATE] = activeEvent$.pipe(
+    map(e => ({ event_type: eventTypes.ACTIVATE }))
+  )
+
+  const tick$ = interval(tick).pipe(map(e => ({ event_type: eventTypes.TICK })))
+
+  streams[eventTypes.TICK] = merge(tick$, streams[eventTypes.ACTIVATE]).pipe(
+    scan(
+      (prev, e) => ({
+        ...e,
+        active:
+          e.event_type === eventTypes.ACTIVATE ? !prev.active : prev.active
+      }),
+      { active: false }
+    ),
+    filter(e => e.active)
   )
 
   return { emitters, streams }

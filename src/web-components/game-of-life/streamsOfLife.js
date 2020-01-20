@@ -9,48 +9,39 @@ import { merge } from 'rxjs'
 import { updateWorld, toggleCell } from './rulesOfLife'
 import { eventTypes, makeStreamStore } from './streamStore'
 
+// world reducing; resulting function signature is f: world => world
+const worldReducer = e => {
+  switch (e.event_type) {
+    case eventTypes.TICK:
+      return world => updateWorld(world)
+    case eventTypes.TOGGLE: {
+      const col = parseInt(e.event_payload.col)
+      const row = parseInt(e.event_payload.row)
+      return world => toggleCell(world, col, row)
+    }
+    case eventTypes.RESET: {
+      return world => updateWorld(e.event_payload.world)
+    }
+    default:
+  }
+}
+
+const eventTypeFilter = e =>
+  e.event_type === eventTypes.TOGGLE ||
+  e.event_type === eventTypes.RESET ||
+  e.event_type === eventTypes.TICK
+
 // make stream of functions which evolve world
 const worldFunc$ = (streams, active) => {
-  const activeScanner = (prev, e) => ({
-    ...e,
-    active: e.event_type === eventTypes.ACTIVATE ? !prev.active : prev.active
-  })
-
-  const update$ = merge(
+  const worldFunc$ = merge(
     streams[eventTypes.RESET],
     streams[eventTypes.TOGGLE],
-    streams[eventTypes.ACTIVATE],
     streams[eventTypes.TICK]
   ).pipe(
-    // add property 'active' to combined stream
-    scan(activeScanner, { active }),
-    // pick only interesting event types and if 'active' is true
-    filter(
-      e =>
-        e.event_type === eventTypes.TOGGLE ||
-        e.event_type === eventTypes.RESET ||
-        (e.event_type === eventTypes.TICK && e.active)
-    )
-  )
-
-  // make a stream of functions which reflect events affecting the world state
-  // resulting function signature is f: world => world
-  const worldFunc$ = update$.pipe(
-    map(e => {
-      switch (e.event_type) {
-        case eventTypes.TICK:
-          return world => updateWorld(world)
-        case eventTypes.TOGGLE: {
-          const col = parseInt(e.event_payload.col)
-          const row = parseInt(e.event_payload.row)
-          return world => toggleCell(world, col, row)
-        }
-        case eventTypes.RESET: {
-          return world => updateWorld(e.event_payload.world)
-        }
-        default:
-      }
-    })
+    // filter interested streams
+    filter(eventTypeFilter),
+    // reduce
+    map(worldReducer)
   )
 
   return worldFunc$

@@ -2,6 +2,10 @@ import { h, customElement, useState, useEffect } from 'atomico'
 import { eventTypes } from './streamStore'
 import streamsOfLife from './streamsOfLife'
 
+const createCustomEvent = (event, detail) => {
+  return new window.CustomEvent(event, { detail })
+}
+
 const GameOfLife = props => {
   const { initialWorld, tick, active } = props
 
@@ -25,7 +29,7 @@ const GameOfLife = props => {
     const activeSub = activate$.subscribe(active =>
       console.log(`Active? ${active}`)
     )
-    const resetSub = reset$.subscribe(e => console.log('RESET - observed'))
+    const resetSub = reset$.subscribe(e => console.log('RESET'))
 
     return () => {
       worldSub.unsubscribe()
@@ -38,9 +42,7 @@ const GameOfLife = props => {
   // emits 'cell_toggle' event
   useEffect(() => {
     if (cellToggle) {
-      emitters[eventTypes.TOGGLE](
-        new window.CustomEvent('cell_toggle', { detail: cellToggle })
-      )
+      emitters[eventTypes.TOGGLE](createCustomEvent('cell_toggle', cellToggle))
     }
   }, [cellToggle])
 
@@ -49,16 +51,14 @@ const GameOfLife = props => {
     if (initialWorld) {
       setWorld(initialWorld)
       emitters[eventTypes.RESET](
-        new window.CustomEvent('reset', {
-          detail: { tick, world: initialWorld }
-        })
+        createCustomEvent('reset', { world: initialWorld })
       )
     }
-  }, [initialWorld, tick])
+  }, [initialWorld])
 
   // emits 'activate' event
   useEffect(() => {
-    emitters[eventTypes.ACTIVATE](new window.CustomEvent('active_toggle'))
+    emitters[eventTypes.ACTIVATE](createCustomEvent('active_toggle'))
   }, [active])
 
   return (
