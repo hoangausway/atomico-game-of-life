@@ -70,7 +70,7 @@ export const useEventStream = (dependencies = []) => {
 Usage of useEventStream:
 
 ```bash
-/src/web-components/game-of-life/useEventOfLife.js
+/src/web-components/game-of-life/streamStore.js
 import { useEventStream } from './useEventStream'
 import { map } from 'rxjs/operators'
 ...
@@ -91,22 +91,22 @@ useEffect(
     ...
     resetEmitter(
         new window.CustomEvent('reset', {
-          detail: { tick, world: initialWorld }
+          detail: { world: initialWorld }
         })
       )  
-  }, [tick, initialWorld])
+  }, [initialWorld])
 ```
 **Subscribe/unsubscribe stream within useEffect**
 ```bash
-/src/web-components/game-of-life/useEventOfLife.js
+/src/web-components/game-of-life/game-of-life.js
 import { useEffect } from 'atomico'
 ...
 useEffect(() => {
   ...
-  const resetSubscriber = reset$.subscribe(e => console.log('RESET - observed'))
+  const worldSub = world$.subscribe(setWorld)
   return () => {
     ...
-    resetSubscriber.unsubscribe()
+    worldSub.unsubscribe()
   }
 }, [])
 ```
