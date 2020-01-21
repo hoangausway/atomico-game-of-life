@@ -66,10 +66,7 @@ export const makeStreamStore = props => {
     map(e => ({ event_type: eventTypes.ACTIVATE }))
   )
 
-  const tick$ = reset$.pipe(
-    switchMap(e => interval(tick)),
-    map(e => ({ event_type: eventTypes.TICK }))
-  )
+  const tick$ = interval(tick).pipe(map(e => ({ event_type: eventTypes.TICK })))
 
   const activeTick$ = merge(tick$, activate$).pipe(
     scan(
