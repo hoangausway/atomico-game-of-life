@@ -1,5 +1,5 @@
 /*
-  Implement app's logics by transforming the state streams provided by 'Stream Store'.
+  Implement app's logics by transforming the streams provided by 'Stream Store'.
 */
 
 // eslint-disable-next-line
@@ -32,12 +32,8 @@ const eventTypeFilter = e =>
   e.event_type === eventTypes.TICK
 
 // make stream of functions which evolve world
-const worldFunc$ = (streams, active) => {
-  const worldFunc$ = merge(
-    streams[eventTypes.RESET],
-    streams[eventTypes.TOGGLE],
-    streams[eventTypes.TICK]
-  ).pipe(
+const worldFunc$ = ({ toggle$, reset$, activeTick$ }, active) => {
+  const worldFunc$ = merge(toggle$, reset$, activeTick$).pipe(
     // filter interested streams
     filter(eventTypeFilter),
     // reduce
@@ -51,20 +47,22 @@ const streamsOfLife = props => {
   const { tick, active, initialWorld } = props
 
   // transfrom streams as game's business requires
-  const { emitters, streams } = makeStreamStore({ tick })
+  const {
+    emitters,
+    streams: { toggle$, reset$, activeTick$, activate$ }
+  } = makeStreamStore({ tick })
 
   // transform world stream
-  const world$ = worldFunc$(streams, active).pipe(
+  const world$ = worldFunc$({ toggle$, reset$, activeTick$ }, active).pipe(
     scan((world, f) => f(world), initialWorld)
   )
 
   // transform the active stream for tracking and responding paused value if needed
-  const activate$ = streams[eventTypes.ACTIVATE].pipe(
+  const active$ = activate$.pipe(
     scan((active, event) => !active, active)
   )
 
-  const reset$ = streams[eventTypes.RESET]
-  return { world$, activate$, reset$, emitters }
+  return { emitters, streams: { world$, active$, reset$ } }
 }
 
 export default streamsOfLife

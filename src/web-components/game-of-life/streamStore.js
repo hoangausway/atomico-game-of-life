@@ -5,9 +5,9 @@
   - created by system (tick)
   
   Our component will react to following events:
+  - toggle cell, triggered whe user clicks on a cell in grid
   - reset, triggered when user clicks button [RESET]
   - pause/activate, triggered when user clicks button [PAUSE/CONTINUE]
-  - toggle cell, triggered whe user clicks on a cell in grid
   - automatic update grid based on 'rule-of-life' logics; this event will be triggered by background 'tick'
 
   METHODOLOGY:
@@ -44,37 +44,34 @@ export const makeStreamStore = props => {
 
   // define event streams and related triggers
   const [toggleEmitter, toggleEvent$] = useEventStream()
-  const [activateEmitter, activeEvent$] = useEventStream()
   const [resetEmitter, resetEvent$] = useEventStream()
-
-  const emitters = {}
-  emitters[eventTypes.RESET] = resetEmitter
-  emitters[eventTypes.ACTIVATE] = activateEmitter
-  emitters[eventTypes.TOGGLE] = toggleEmitter
+  const [activateEmitter, activeEvent$] = useEventStream()
 
   // define and preprocess streams
-  const streams = {}
-  streams[eventTypes.RESET] = resetEvent$.pipe(
-    map(e => ({
-      event_type: eventTypes.RESET,
-      event_payload: e.detail
-    }))
-  )
-
-  streams[eventTypes.TOGGLE] = toggleEvent$.pipe(
+  const toggle$ = toggleEvent$.pipe(
     map(e => ({
       event_type: eventTypes.TOGGLE,
       event_payload: e.detail
     }))
   )
 
-  streams[eventTypes.ACTIVATE] = activeEvent$.pipe(
+  const reset$ = resetEvent$.pipe(
+    map(e => ({
+      event_type: eventTypes.RESET,
+      event_payload: e.detail
+    }))
+  )
+
+  const activate$ = activeEvent$.pipe(
     map(e => ({ event_type: eventTypes.ACTIVATE }))
   )
 
-  const tick$ = interval(tick).pipe(map(e => ({ event_type: eventTypes.TICK })))
+  const tick$ = reset$.pipe(
+    switchMap(e => interval(tick)),
+    map(e => ({ event_type: eventTypes.TICK }))
+  )
 
-  streams[eventTypes.TICK] = merge(tick$, streams[eventTypes.ACTIVATE]).pipe(
+  const activeTick$ = merge(tick$, activate$).pipe(
     scan(
       (prev, e) => ({
         ...e,
@@ -86,5 +83,8 @@ export const makeStreamStore = props => {
     filter(e => e.active)
   )
 
-  return { emitters, streams }
+  return {
+    emitters: { toggleEmitter, resetEmitter, activateEmitter },
+    streams: { toggle$, reset$, activate$, activeTick$ }
+  }
 }
