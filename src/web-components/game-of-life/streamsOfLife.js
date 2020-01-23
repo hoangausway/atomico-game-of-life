@@ -48,8 +48,10 @@ const streamsOfLife = props => {
 
   // transfrom streams as game's business requires
   const {
-    emitters,
-    streams: { toggle$, reset$, activeTick$, activate$ }
+    toggle: [toggle$, toggleEmitter],
+    reset: [reset$, resetEmitter],
+    active: [active$, activateEmitter],
+    activeTick: [activeTick$]
   } = makeStreamStore({ tick })
 
   // transform world stream
@@ -57,12 +59,10 @@ const streamsOfLife = props => {
     scan((world, f) => f(world), initialWorld)
   )
 
-  // transform the active stream for tracking and responding paused value if needed
-  const active$ = activate$.pipe(
-    scan((active, event) => !active, active)
-  )
-
-  return { emitters, streams: { world$, active$, reset$ } }
+  return [
+    { toggleEmitter, resetEmitter, activateEmitter },
+    { world$, active$, reset$ }
+  ]
 }
 
 export default streamsOfLife

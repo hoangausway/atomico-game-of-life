@@ -5,21 +5,23 @@ const createCustomEvent = (event, detail) => {
   return new window.CustomEvent(event, { detail })
 }
 
+/*
+  Props: initialWorld, active, tick
+  Render: grid of cells
+  Events: click [cell]
+*/
 const GameOfLife = props => {
   const { initialWorld, tick, active } = props
 
-  // state: world
-  const [world, setWorld] = useState(initialWorld)
-  const { arr, cols, rows } = world
-
-  //  state: cellToggle
+  // states: world, cellToggle
+  const [{ arr, cols, rows }, setWorld] = useState(initialWorld)
   const [cellToggle, setCellToggle] = useState(null)
 
-  // interested streams and emitters
-  const {
-    streams: { world$, active$, reset$ },
-    emitters: { toggleEmitter, resetEmitter, activateEmitter }
-  } = streamsOfLife({
+  // interested emitters and streams
+  const [
+    { toggleEmitter, resetEmitter, activateEmitter },
+    { world$, active$, reset$ }
+  ] = streamsOfLife({
     active,
     tick,
     initialWorld
@@ -52,9 +54,7 @@ const GameOfLife = props => {
   useEffect(() => {
     if (initialWorld) {
       setWorld(initialWorld)
-      resetEmitter(
-        createCustomEvent('reset', { world: initialWorld, tick })
-      )
+      resetEmitter(createCustomEvent('reset', { world: initialWorld, tick }))
     }
   }, [initialWorld, tick])
 
@@ -63,6 +63,7 @@ const GameOfLife = props => {
     activateEmitter(createCustomEvent('active_toggle'))
   }, [active])
 
+  // render grids
   return (
     <host shadowDom style={gridStyle(cols, rows)}>
       {arr.map((alive, idx) => {
@@ -92,7 +93,7 @@ GameOfLife.props = {
   tick: {
     type: Number,
     get value () {
-      return 100
+      return 200
     }
   },
   active: {

@@ -34,7 +34,6 @@ import { useEventStream } from './useEventStream'
 // event type constants
 export const eventTypes = {
   RESET: 'event_reset',
-  ACTIVATE: 'event_activate',
   TOGGLE: 'event_toggle',
   TICK: 'event_tick'
 }
@@ -62,26 +61,29 @@ export const makeStreamStore = props => {
     }))
   )
 
-  const activate$ = activeEvent$.pipe(
-    map(e => ({ event_type: eventTypes.ACTIVATE }))
-  )
-
   const tick$ = interval(tick).pipe(map(e => ({ event_type: eventTypes.TICK })))
 
-  const activeTick$ = merge(tick$, activate$).pipe(
+  const activeTick$ = merge(tick$, activeEvent$).pipe(
     scan(
       (prev, e) => ({
         ...e,
         active:
-          e.event_type === eventTypes.ACTIVATE ? !prev.active : prev.active
+          e.event_type === eventTypes.TICK ? prev.active : !prev.active
       }),
       { active: false }
     ),
     filter(e => e.active)
   )
 
+  // transform the active stream for tracking and responding paused value if needed
+  const active$ = activeEvent$.pipe(
+    scan((active, event) => !active, false)
+  )
+  
   return {
-    emitters: { toggleEmitter, resetEmitter, activateEmitter },
-    streams: { toggle$, reset$, activate$, activeTick$ }
+    toggle: [toggle$, toggleEmitter],
+    reset: [reset$, resetEmitter],
+    active: [active$, activateEmitter],
+    activeTick: [activeTick$]
   }
 }
