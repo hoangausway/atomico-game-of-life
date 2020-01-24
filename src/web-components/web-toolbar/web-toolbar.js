@@ -32,9 +32,7 @@ export default customElement('web-toolbar', WebToolbar)
 
 // Helpers - CSS
 const toolbarStyle = () => ({
-  width: '100%',
-  display: 'block',
-  border: '1px solid #fafafa'
+  width: '100%'
 })
 
 const buttonStyle = () => ({
