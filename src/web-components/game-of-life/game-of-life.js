@@ -1,67 +1,35 @@
 import { h, customElement, useState, useEffect } from 'atomico'
-import streamsOfLife from './streamsOfLife'
+import { streamsOfLife, makeInitialWorld } from './streamsOfLife'
 
 const createCustomEvent = (event, detail) => {
   return new window.CustomEvent(event, { detail })
 }
 
 /*
-  Props: initialWorld, active, tick
+  Props:
   Render: grid of cells
   Events: click [cell]
 */
 const GameOfLife = props => {
-  const { initialWorld, tick, active } = props
+  // stream store
+  const {
+    toggle: [toggle$, toggleEmitter],
+    reset: [reset$],
+    activeTick: [activeTick$]
+  } = window.StreamStore
+
+  // interested world stream with default initialWorld
+  const initialWorld = makeInitialWorld()
+  const world$ = streamsOfLife(toggle$, reset$, activeTick$, initialWorld)
 
   // states: world, cellToggle
   const [{ arr, cols, rows }, setWorld] = useState(initialWorld)
-  const [cellToggle, setCellToggle] = useState(null)
-
-  // interested emitters and streams
-  const [
-    { toggleEmitter, resetEmitter, activateEmitter },
-    { world$, active$, reset$ }
-  ] = streamsOfLife({
-    active,
-    tick,
-    initialWorld
-  })
 
   // subscribe and unsubscribe streams accordingly
   useEffect(() => {
     const worldSub = world$.subscribe(setWorld)
-    const activeSub = active$.subscribe(active =>
-      console.log(`Active? ${active}`)
-    )
-    const resetSub = reset$.subscribe(e => console.log('RESET'))
-
-    return () => {
-      worldSub.unsubscribe()
-      activeSub.unsubscribe()
-      resetSub.unsubscribe()
-    }
-    // eslint-disable-next-line
+    return () => worldSub.unsubscribe()
   }, [])
-
-  // emits 'cell_toggle' event
-  useEffect(() => {
-    if (cellToggle) {
-      toggleEmitter(createCustomEvent('cell_toggle', cellToggle))
-    }
-  }, [cellToggle])
-
-  // emits 'reset' event
-  useEffect(() => {
-    if (initialWorld) {
-      setWorld(initialWorld)
-      resetEmitter(createCustomEvent('reset', { world: initialWorld, tick }))
-    }
-  }, [initialWorld, tick])
-
-  // emits 'activate' event
-  useEffect(() => {
-    activateEmitter(createCustomEvent('active_toggle'))
-  }, [active])
 
   // render grids
   return (
@@ -75,7 +43,13 @@ const GameOfLife = props => {
             data-row={row}
             key={idx}
             style={cellStyle(alive)}
-            onclick={e => setCellToggle(e.target.dataset)}
+            onclick={e =>
+              toggleEmitter(
+                new window.CustomEvent('cell_toggle', {
+                  detail: e.target.dataset
+                })
+              )
+            }
           />
         )
       })}
@@ -83,26 +57,7 @@ const GameOfLife = props => {
   )
 }
 
-GameOfLife.props = {
-  initialWorld: {
-    type: Object,
-    get value () {
-      return { arr: [] }
-    }
-  },
-  tick: {
-    type: Number,
-    get value () {
-      return 200
-    }
-  },
-  active: {
-    type: Boolean,
-    get value () {
-      return false
-    }
-  }
-}
+GameOfLife.props = {}
 
 export default customElement('game-of-life', GameOfLife)
 

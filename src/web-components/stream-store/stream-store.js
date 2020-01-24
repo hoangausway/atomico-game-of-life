@@ -27,24 +27,31 @@
 
 // eslint-disable-next-line
 import { filter, map, scan, startWith, switchMap, tap } from 'rxjs/operators'
-import { interval, merge } from 'rxjs'
+import { interval, merge, Subject } from 'rxjs'
 
-import { useEventStream } from './useEventStream'
+// import { useEventStream } from './useEventStream'
 
-// event type constants
-export const eventTypes = {
-  RESET: 'event_reset',
-  TOGGLE: 'event_toggle',
-  TICK: 'event_tick'
+const useEventStream = () => {
+  const eventStream$ = new Subject()
+  const eventEmitter = e => eventStream$.next(e) // useCallback maybe OK here
+  return [eventStream$, eventEmitter]
 }
 
-export const makeStreamStore = props => {
-  const { tick } = props
+;(function () {
+  if (window.StreamStore) return window.StreamStore
+  // event type constants
+  const eventTypes = {
+    RESET: 'event_reset',
+    TOGGLE: 'event_toggle',
+    TICK: 'event_tick'
+  }
+
+  const TICK = 200
 
   // define event streams and related triggers
-  const [toggleEmitter, toggleEvent$] = useEventStream()
-  const [resetEmitter, resetEvent$] = useEventStream()
-  const [activateEmitter, activeEvent$] = useEventStream()
+  const [toggleEvent$, toggleEmitter] = useEventStream()
+  const [resetEvent$, resetEmitter] = useEventStream()
+  const [activeEvent$, activateEmitter] = useEventStream()
 
   // define and preprocess streams
   const toggle$ = toggleEvent$.pipe(
@@ -56,34 +63,32 @@ export const makeStreamStore = props => {
 
   const reset$ = resetEvent$.pipe(
     map(e => ({
-      event_type: eventTypes.RESET,
-      event_payload: e.detail
+      event_type: eventTypes.RESET
     }))
   )
 
-  const tick$ = interval(tick).pipe(map(e => ({ event_type: eventTypes.TICK })))
+  const tick$ = interval(TICK).pipe(map(e => ({ event_type: eventTypes.TICK })))
 
   const activeTick$ = merge(tick$, activeEvent$).pipe(
     scan(
       (prev, e) => ({
         ...e,
-        active:
-          e.event_type === eventTypes.TICK ? prev.active : !prev.active
+        active: e.event_type === eventTypes.TICK ? prev.active : !prev.active
       }),
-      { active: false }
+      { active: true }
     ),
     filter(e => e.active)
   )
 
   // transform the active stream for tracking and responding paused value if needed
-  const active$ = activeEvent$.pipe(
-    scan((active, event) => !active, false)
-  )
-  
-  return {
+  const active$ = activeEvent$.pipe(scan((active, event) => !active, true))
+
+  window.StreamStore = {
+    eventTypes: eventTypes,
+    tick: TICK,
     toggle: [toggle$, toggleEmitter],
     reset: [reset$, resetEmitter],
     active: [active$, activateEmitter],
     activeTick: [activeTick$]
   }
-}
+})()

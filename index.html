@@ -23,25 +23,6 @@
         margin: 6px;
       }
 
-      button {
-        width: 120px;
-        height: 32px;
-        margin: 20px 0px 0px 20px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-size: 0.8rem;
-        padding-top: 4px;
-        color: white;
-        background-color: darkred;
-      }
-      .paused {
-        background-color: darkgreen;
-      }
-
-      .reset {
-        background-color: navy;
-      }
-
       .one-cell {
         display: block;
         width: 40px;
@@ -65,81 +46,9 @@
         margin: 20px;
       }
     </style>
-    <script>
-      window.onload = function() {
-        /* game-of-life */
-        function drawPattern(rows, cols, pattern) {
-          const { matrix, originX, originY } = pattern;
-
-          /* make a copy of world to modify */
-          const arr = Array(rows * cols).fill(false);
-
-          /* update each cell according to the pattern */
-          let x, y;
-          for (y = 0; y < matrix.length; y++) {
-            for (x = 0; x < matrix[0].length; x++) {
-              /* check that we are still within the bounds of the world */
-              if (originY + y < rows && originX + x < cols) {
-                arr[(originY + y) * cols + originX + x] = matrix[y][x] === 1;
-              }
-            }
-          }
-
-          return { arr, rows, cols };
-        }
-        const patterns = {
-          // oscillators
-          BLINKER: [
-            [0, 0, 0],
-            [1, 1, 1],
-            [0, 0, 0]
-          ],
-
-          TOAD: [
-            [0, 1, 1, 1],
-            [1, 1, 1, 0]
-          ],
-          QUEEN_BEE_SHUTTLE: [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1],
-            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-          ]
-        };
-        const pattern = {
-          matrix: patterns["QUEEN_BEE_SHUTTLE"],
-          originX: 5,
-          originY: 5
-        };
-        const initialWorld = drawPattern(40, 40, pattern);
-        const gameOfLife = document.getElementById("game-of-life-40");
-        gameOfLife.initialWorld = initialWorld;
-
-        /* PAUSE/ACTIVATE */
-        const btnPause = document.getElementById("btn-toggle-pause");
-        btnPause.addEventListener("click", e => {
-          const ispaused = btnPause.classList.toggle("paused");
-          btnPause.textContent = ispaused ? "CONTINUE" : "PAUSE";
-          gameOfLife.active = ispaused;
-        });
-
-        /* RESET initialWorld */
-        const btnReset = document.getElementById("btn-reset");
-        btnReset.addEventListener("click", e => {
-          gameOfLife.initialWorld = null;
-          setTimeout(function() {
-            gameOfLife.initialWorld = initialWorld;
-          }, 0);
-        });
-      };
-    </script>
   </head>
   <body>
-    <button id="btn-reset" class="reset">RESET</button>
-    <button id="btn-toggle-pause">PAUSE</button>
+    <web-toolbar active="true"></web-toolbar>
     <div class="gol-container">
       <game-of-life id="game-of-life-40"></game-of-life>
     </div>
@@ -165,10 +74,17 @@
       </p>
     </div>
 
-    <!-- <script type="module" src="./src/index.js"></script> -->
+    <script
+      type="module"
+      src="src/web-components/stream-store/stream-store.js"
+    ></script>
     <script
       type="module"
       src="src/web-components/game-of-life/game-of-life.js"
+    ></script>
+    <script
+      type="module"
+      src="src/web-components/web-toolbar/web-toolbar.js"
     ></script>
   </body>
 </html>

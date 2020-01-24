@@ -6,21 +6,22 @@
 import { filter, map, scan, startWith, switchMap, tap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 
-import { updateWorld, toggleCell } from './rulesOfLife'
-import { eventTypes, makeStreamStore } from './streamStore'
+import { updateWorld, toggleCell, drawPattern } from './rulesOfLife'
+import patterns from './patterns'
+const { eventTypes } = window.StreamStore
 
 // world reducing; resulting function signature is f: world => world
 const worldReducer = e => {
   switch (e.event_type) {
-    case eventTypes.TICK:
-      return world => updateWorld(world)
     case eventTypes.TOGGLE: {
       const col = parseInt(e.event_payload.col)
       const row = parseInt(e.event_payload.row)
       return world => toggleCell(world, col, row)
     }
+    case eventTypes.TICK:
+      return world => updateWorld(world)
     case eventTypes.RESET: {
-      return world => updateWorld(e.event_payload.world)
+      return world => updateWorld(makeInitialWorld())
     }
     default:
   }
@@ -31,38 +32,26 @@ const eventTypeFilter = e =>
   e.event_type === eventTypes.RESET ||
   e.event_type === eventTypes.TICK
 
+const initialPattern = 'QUEEN_BEE_SHUTTLE'
+// const initialPattern = 'TOAD'
+export const makeInitialWorld = () => {
+  const matrix = patterns[initialPattern]
+  return drawPattern(40, 40, { matrix, col0: 5, row0: 5 })
+}
+
+const EMPTY = { arr: [] }
 // make stream of functions which evolve world
-const worldFunc$ = ({ toggle$, reset$, activeTick$ }, active) => {
-  const worldFunc$ = merge(toggle$, reset$, activeTick$).pipe(
-    // filter interested streams
-    filter(eventTypeFilter),
-    // reduce
-    map(worldReducer)
-  )
-
-  return worldFunc$
-}
-
-const streamsOfLife = props => {
-  const { tick, active, initialWorld } = props
-
-  // transfrom streams as game's business requires
-  const {
-    toggle: [toggle$, toggleEmitter],
-    reset: [reset$, resetEmitter],
-    active: [active$, activateEmitter],
-    activeTick: [activeTick$]
-  } = makeStreamStore({ tick })
-
+export const streamsOfLife = (
+  toggle$,
+  reset$,
+  activeTick$,
+  initialWorld = EMPTY
+) => {
   // transform world stream
-  const world$ = worldFunc$({ toggle$, reset$, activeTick$ }, active).pipe(
-    scan((world, f) => f(world), initialWorld)
+  const world$ = merge(toggle$, reset$, activeTick$).pipe(
+    filter(eventTypeFilter), // filter interested streams
+    map(worldReducer), // reduce events to world update functions ---function---function---function
+    scan((world, f) => f(world), initialWorld) // scan as the world evolves ---world---world---
   )
-
-  return [
-    { toggleEmitter, resetEmitter, activateEmitter },
-    { world$, active$, reset$ }
-  ]
+  return world$
 }
-
-export default streamsOfLife
