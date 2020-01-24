@@ -31,13 +31,11 @@ const WebToolbar = () => {
 export default customElement('web-toolbar', WebToolbar)
 
 // Helpers - CSS
-const toolbarStyle = () => {
-  return {
-    width: '100%',
-    display: 'block',
-    border: '1px solid #fafafa'
-  }
-}
+const toolbarStyle = () => ({
+  width: '100%',
+  display: 'block',
+  border: '1px solid #fafafa'
+})
 
 const buttonStyle = () => ({
   width: '120px',
