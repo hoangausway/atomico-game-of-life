@@ -96,7 +96,7 @@ useEffect(() => {
 # emits `cell_toggle` event using `toggleEmitter`
 const clickHandler = e =>
     toggleEmitter(
-      new window.CustomEvent('cell_toggle', { detail: e.target.dataset })
+      new window.CustomEvent('cell_toggle', { detail: {col, row} })
     )
 ```
 
