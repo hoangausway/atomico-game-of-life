@@ -80,12 +80,8 @@ const [activeEvent$, activateEmitter] = streamEmitter()
 import { useEffect } from 'atomico'
 ...
 useEffect(() => {
-  ...
   const worldSub = world$.subscribe(setWorld)
-  return () => {
-    ...
-    worldSub.unsubscribe()
-  }
+  return () =>  worldSub.unsubscribe()
 }, [])
 ```
 
