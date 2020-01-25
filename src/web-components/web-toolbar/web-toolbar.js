@@ -4,9 +4,12 @@ const WebToolbar = () => {
   const {
     reset: [reset$, resetEmitter],
     active: [active$, activateEmitter]
-  } = window.StreamStore
+  } = window.GameOfLifeStreams
 
+  // an variable to track 'active' state of button [PAUSE]
   const [active, setActive] = useState(true)
+
+  // subscribe/unsubscribe streams as side effects
   useEffect(() => {
     const resetSub = reset$.subscribe(console.log)
     const activeSub = active$.subscribe(setActive)

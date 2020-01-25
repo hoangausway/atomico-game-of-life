@@ -6,11 +6,21 @@
 import { filter, map, scan, startWith, switchMap, tap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 
-import { updateWorld, toggleCell, drawPattern } from './rulesOfLife'
-import patterns from './patterns'
-const { eventTypes } = window.StreamStore
+import { updateWorld, toggleCell, drawPattern } from './rules-of-life'
+import patternCollection from './patterns'
+/*
+  exports predefined pattern samples
+*/
+export const patternKeys = Object.keys(patternCollection) // ['EMPTY', 'TOAD', ...]
+export const patterns = patternCollection
+export const makeInitialWorld = patternName => {
+  const pattern = patternName || 'QUEEN_BEE_SHUTTLE'
+  const matrix = patterns[pattern.toUpperCase()] || []
+  return drawPattern(40, 40, { matrix, col0: 5, row0: 5 })
+}
 
 // world reducing; resulting function signature is f: world => world
+const { eventTypes } = window.GameOfLifeStreams // eventTypes defs from GaemOfLifeStreams
 const worldReducer = e => {
   switch (e.event_type) {
     case eventTypes.TOGGLE: {
@@ -32,16 +42,11 @@ const eventTypeFilter = e =>
   e.event_type === eventTypes.RESET ||
   e.event_type === eventTypes.TICK
 
-const initialPattern = 'QUEEN_BEE_SHUTTLE'
-// const initialPattern = 'TOAD'
-export const makeInitialWorld = () => {
-  const matrix = patterns[initialPattern]
-  return drawPattern(40, 40, { matrix, col0: 5, row0: 5 })
-}
-
+/*
+  make stream of functions which then update the world
+*/
 const EMPTY = { arr: [] }
-// make stream of functions which evolve world
-export const streamsOfLife = (
+export const makeStreamsOfLife = (
   toggle$,
   reset$,
   activeTick$,

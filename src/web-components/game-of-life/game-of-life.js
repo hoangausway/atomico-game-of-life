@@ -1,9 +1,5 @@
 import { h, customElement, useState, useEffect } from 'atomico'
-import { streamsOfLife, makeInitialWorld } from './streamsOfLife'
-
-const createCustomEvent = (event, detail) => {
-  return new window.CustomEvent(event, { detail })
-}
+import { makeStreamsOfLife, makeInitialWorld } from './world-stream'
 
 /*
   Props:
@@ -16,14 +12,18 @@ const GameOfLife = props => {
     toggle: [toggle$, toggleEmitter],
     reset: [reset$],
     activeTick: [activeTick$]
-  } = window.StreamStore
+  } = window.GameOfLifeStreams
 
   // interested world stream with default initialWorld
   const initialWorld = makeInitialWorld()
-  const world$ = streamsOfLife(toggle$, reset$, activeTick$, initialWorld)
+  const world$ = makeStreamsOfLife(toggle$, reset$, activeTick$, initialWorld)
 
   // states: world, cellToggle
   const [{ arr, cols, rows }, setWorld] = useState(initialWorld)
+  const clickHandler = e =>
+    toggleEmitter(
+      new window.CustomEvent('cell_toggle', { detail: e.target.dataset })
+    )
 
   // subscribe and unsubscribe streams accordingly
   useEffect(() => {
@@ -43,13 +43,7 @@ const GameOfLife = props => {
             data-row={row}
             key={idx}
             style={cellStyle(alive)}
-            onclick={e =>
-              toggleEmitter(
-                new window.CustomEvent('cell_toggle', {
-                  detail: e.target.dataset
-                })
-              )
-            }
+            onclick={clickHandler}
           />
         )
       })}
@@ -60,6 +54,8 @@ const GameOfLife = props => {
 GameOfLife.props = {}
 
 export default customElement('game-of-life', GameOfLife)
+
+// Helpers - Utils
 
 // Helpers - CSS
 const gridStyle = (cols, rows) => {
