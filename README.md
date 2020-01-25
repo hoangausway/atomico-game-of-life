@@ -7,8 +7,6 @@
 
 ## To show
 - Define a web component without class (Atomico way, likes modern React)
-- Using 'props' to set properties to web component (Atomico way, some 'yes' and 'no')
-- Using dispatch mechanism to raise event from web component to outside world
 - Taste Functional Reactive Programming (RxJS) with Atomico
 
 For basic examples please see:
@@ -20,9 +18,10 @@ For basic examples please see:
 - [`<random-flip>`: A simple "game" exploring web components web-cell and web-grid](https://github.com/hoangausway/atomico-random-flip)
 
 ## Source - Build - Run
+- Web compoenent `<game-of-life>`.
+- Web compoenent `<web-toolbar>`.
+- Central store of streams (RxJS Subject)
 
-- The project structure is based on the **Hello World** example of Atomico author. The component `<hello-world>` is kept for reference in case it's needed.
-- Added `<game-of-life>` component.
 - Commands to install, build, watch and run:
 
 ```bash
@@ -50,53 +49,32 @@ A good source introducing Reactive Programming/RxJs/Game Of Life: [https://docs.
 ## Takeaways
 **How RxJS works with Atomico**
 
-**Engage DOM event with RxJS stream using Atomico useMemo/useCallback**
+**Engage DOM event with RxJS stream
 ```bash
-/src/web-components/game-of-life/useEventStream.js
+/src/web-components/gol-streams/gol-streams.js
 
-import { useMemo } from 'atomico'
 import { Subject } from 'rxjs'
 
-export const useEventStream = (dependencies = []) => {
-  const eventStream$ = useMemo(() => new Subject(), dependencies)
-  const eventEmit = e => eventStream$.next(e)
-  # useCallback maybe OK here:
-  # const eventEmit = useCallback(e => eventStream$.next(e), dependencies)
-  # at the writing moment the useCallback not available yet.
-  return [eventEmit, eventStream$]
+# makes an event stream with Subject which will be triggered by event emitter
+const streamEmitter = () => {
+  const eventStream$ = new Subject()
+  const eventEmitter = e => eventStream$.next(e)
+  return [eventStream$, eventEmitter]
 }
 ```
 
-Usage of useEventStream:
+Usage of streamEmitter:
 
 ```bash
-/src/web-components/game-of-life/streamStore.js
-import { useEventStream } from './useEventStream'
-import { map } from 'rxjs/operators'
+/src/web-components/gol-streams/gol-streams.js
 ...
 # define event streams and related triggers
-const [toggleEmitter, toggleEvent$] = useEventStream()
-const [activateEmitter, activeEvent$] = useEventStream()
-const [resetEmitter, resetEvent$] = useEventStream()
+const [toggleEvent$, toggleEmitter] = streamEmitter()
+const [resetEvent$, resetEmitter] = streamEmitter()
+const [activeEvent$, activateEmitter] = streamEmitter()
 ...
 ```
-**Emit stream within useEffect**
-```bash
-/src/web-components/game-of-life/game-of-life.js
-import { useEffect } from 'atomico'
-...
-# emits `reset` event using `resetEmmiter`
-useEffect(
-  () => {
-    ...
-    resetEmitter(
-        new window.CustomEvent('reset', {
-          detail: { world: initialWorld }
-        })
-      )  
-  }, [initialWorld])
-```
-**Subscribe/unsubscribe stream within useEffect**
+**Subscribe/unsubscribe streams as side effects in useEffect block**
 ```bash
 /src/web-components/game-of-life/game-of-life.js
 import { useEffect } from 'atomico'
@@ -109,6 +87,17 @@ useEffect(() => {
     worldSub.unsubscribe()
   }
 }, [])
+```
+
+**Emit stream**
+```bash
+/src/web-components/game-of-life/game-of-life.js
+...
+# emits `cell_toggle` event using `toggleEmitter`
+const clickHandler = e =>
+    toggleEmitter(
+      new window.CustomEvent('cell_toggle', { detail: e.target.dataset })
+    )
 ```
 
 ## What's next

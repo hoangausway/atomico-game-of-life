@@ -1,28 +1,26 @@
 /*
-  General store for streams which affect our component.
-  There're 2 groups of streams:
-  - created by user interaction (click, typing, etc.)
-  - created by system (tick)
+  The central store of streams which affect our component.
+  It exports a global object named GameOfLifeStreams for components to use.
+
+  As general rules, there're 2 groups of streams:
+  - the streams triggered by user interaction (click, typing, etc.)
+  - the streams created by system (tick)
   
-  Our component will react to following events:
-  - toggle cell, triggered when user clicks on a cell in grid
-  - reset, triggered when user clicks button [RESET]
-  - pause/activate, triggered when user clicks button [PAUSE/CONTINUE]
-  - automatic update grid based on 'rule-of-life' logics; this event will be triggered by background 'tick'
+  1. Create the pairs of raw streams and emitters (may be triggered by user interaction)
+  2. Apply some simple transformation as required by business logics
+  3. Exports as whole object (central store of streams) to global 'window'
+  4. Components can access the store as neccessary. They can use as it or do further transformation.
 
-  METHODOLOGY:
-  (1) [PURE] In this module 'gaemoflife-streams'
-      With above events in mind, we prepare the corresponding streams using RxJS observables.
-      Here's stores 'streams of events'
+  In this particular application, we will consider the following streams (and corresponding emitters):
+  - stream of cell toggling event, triggered when user clicks on a cell in the grid
+  - stream of 'reset' event, triggered when user made a 'reset' action (for example: clicks on some [RESET] button)
+  - stream of 'pause/activate' event, triggered when user made a 'pause/continue' action (clicks button [PAUSE/CONTINUE])
+  - stream of ticks, which will automatically update grid based on 'rule-of-life' logics
+    (this stream is triggered by background 'tick' which taking account of 'pause/activate' events
 
-  (2) [PURE] In module 'world-stream'
-      The app's logics are implemented in separate module 'world-stream',
-      in which the streams are transforming appropriatelly.
-      This module plays role of 'reducer'.
-
-  (3) [SIDE EFFECT] In main module 'game-of-life'
-      Later on, in the main module of component we subscribe to world stream and perform side effects.
-      Interesting things happen. User interacts with app and watch results.
+  NOTES:
+  - All transformations in this module are pure functions
+  - The components which use these streams will subscribe/unsubscribe them as side effects
 */
 
 // eslint-disable-next-line
