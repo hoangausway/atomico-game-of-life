@@ -2,6 +2,20 @@ import { h, customElement, useState, useEffect } from 'atomico'
 import { makeStreamsOfLife, makeInitialWorld } from './world-stream'
 
 /*
+  return 'state' value from stream 'state$'
+*/
+const useState$ = (state$, initialState) => {
+  // setup state for current comopnent
+  const [state, setState] = useState(initialState)
+  useEffect(() => {
+    const sub = state$.subscribe(setState)
+    return () => sub.unsubscribe()
+  }, [])
+
+  return state
+}
+
+/*
   Props:
   Render: grid of cells
   Events: click [cell]
@@ -14,22 +28,15 @@ const GameOfLife = props => {
     activeTick: [activeTick$]
   } = window.GameOfLifeStreams
 
-  // interested world stream with default initialWorld
+  // interested world stream with an initial world
   const initialWorld = makeInitialWorld()
   const world$ = makeStreamsOfLife(toggle$, reset$, activeTick$, initialWorld)
+  const { arr, cols, rows } = useState$(world$, initialWorld)
 
-  // states: world, cellToggle
-  const [{ arr, cols, rows }, setWorld] = useState(initialWorld)
   const clickHandler = e =>
     toggleEmitter(
       new window.CustomEvent('cell_toggle', { detail: e.target.dataset })
     )
-
-  // subscribe and unsubscribe streams accordingly
-  useEffect(() => {
-    const worldSub = world$.subscribe(setWorld)
-    return () => worldSub.unsubscribe()
-  }, [])
 
   // render grids
   return (
