@@ -5,7 +5,7 @@
   As general rules, there're 2 groups of streams:
   - the streams triggered by user interaction (click, typing, etc.)
   - the streams created by system (tick)
-  
+
   1. Create the pairs of raw streams and emitters (may be triggered by user interaction)
   2. Apply some simple transformation as required by business logics
   3. Exports as whole object (central store of streams) to global 'window'
