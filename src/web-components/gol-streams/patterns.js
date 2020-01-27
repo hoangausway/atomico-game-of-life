@@ -6,7 +6,7 @@
  * 17.05.2017 G.S.C.
  ******************************************************/
 
-export default {
+export const patterns = {
   // empty
   EMPTY: [[0]],
 
@@ -1610,3 +1610,5 @@ export default {
     [0, 0, 1, 1, 0, 0, 0, 0]
   ]
 }
+export const patternKeys = Object.keys(patterns) // ['EMPTY', 'TOAD', ...]
+
