@@ -10,8 +10,8 @@
 		"prepare": "npm run build"
 	},
 	"dependencies": {
-    "atomico": "^0.21.1",
-    "rxjs": "^6.5.4"
+		"atomico": "^0.21.1",
+		"rxjs": "^6.5.4"
 	},
 	"devDependencies": {
 		"bundle-cli": "^0.21.5"
