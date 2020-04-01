@@ -25,7 +25,7 @@
 
 // eslint-disable-next-line
 import { filter, map, scan, startWith, switchMap, tap } from 'rxjs/operators'
-import { interval, merge, Subject } from 'rxjs'
+import { interval, merge } from 'rxjs'
 
 import EventTypes from './event-types'
 import { updateWorld, toggleCell, drawPattern } from './rules-of-life'
