@@ -1,11 +1,4 @@
 /*
-  Streams Of Life:
-  pause$
-  toggle$
-  tick$
-*/
-
-/*
   Rules: In a grid, a cell may be live or dead (black or white).
   Grid is started with some live cells and then be evolving over time (ticks).
   At each moment, each cell is examined to change it's status.

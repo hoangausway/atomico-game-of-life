@@ -1,18 +1,5 @@
 import { h, customElement, useState, useEffect } from 'atomico'
-
-/*
-  return 'state' value from stream 'state$'
-*/
-const useState$ = (state$, initialState) => {
-  // setup state for current comopnent
-  const [state, setState] = useState(initialState)
-  useEffect(() => {
-    const sub = state$.subscribe(setState)
-    return () => sub.unsubscribe()
-  }, [])
-
-  return state
-}
+import { useState$ } from '../../utils/util-useState$'
 
 const createEvent = (event, detail) =>
   new window.CustomEvent('cell_toggle', { detail })

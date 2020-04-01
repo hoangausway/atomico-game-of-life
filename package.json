@@ -5,15 +5,15 @@
 	"source": "index.html",
 	"scripts": {
 		"build": "bundle index.html dist",
-		"build:web-components": "bundle src/web-components/**/*-*.js web-components --external",
-		"dev": "bundle index.html dist --server 3000",
+		"build:web-components": "bundle src/components/**/*-*.js web-components --external",
+		"dev": "bundle index.html dist --watch --server",
 		"prepare": "npm run build"
 	},
 	"dependencies": {
-		"atomico": ">=0.8",
-		"rxjs": "^6.5.3"
+    "atomico": "^0.21.1",
+    "rxjs": "^6.5.4"
 	},
 	"devDependencies": {
-		"bundle-cli": "^0.6.3"
+		"bundle-cli": "^0.21.5"
 	}
 }

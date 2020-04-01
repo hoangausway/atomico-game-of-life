@@ -31,20 +31,13 @@ import EventTypes from './event-types'
 import { updateWorld, toggleCell, drawPattern } from './rules-of-life'
 import { patterns } from './patterns'
 
+import { streaming } from '../../utils/util-streaming'
+
 // helper
 const makeInitialWorld = patternName => {
   const pattern = patternName || 'QUEEN_BEE_SHUTTLE'
   const matrix = patterns[pattern.toUpperCase()] || []
   return drawPattern(40, 40, { matrix, col0: 5, row0: 5 })
-}
-
-/*
-  makes an event stream with Subject which will be triggered by event emitter
-*/
-const streamEmitter = () => {
-  const eventStream$ = new Subject() // useMemo(() => new Subject(), [])
-  const eventEmitter = e => eventStream$.next(e) // useCallback(e => eventStream$.next(e))
-  return [eventStream$, eventEmitter]
 }
 
 /*
@@ -55,9 +48,9 @@ const streamEmitter = () => {
   const TICK = 500
 
   // define event streams and related triggers
-  const [toggleEvent$, toggleEmitter] = streamEmitter()
-  const [resetEvent$, resetEmitter] = streamEmitter()
-  const [activeEvent$, activateEmitter] = streamEmitter()
+  const [toggleEvent$, toggleEmitter] = streaming()
+  const [resetEvent$, resetEmitter] = streaming()
+  const [activeEvent$, activateEmitter] = streaming()
 
   // define and preprocess streams
   const toggle$ = toggleEvent$.pipe(
