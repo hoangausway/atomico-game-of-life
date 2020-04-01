@@ -27,9 +27,9 @@
 import { filter, map, scan, startWith, switchMap, tap } from 'rxjs/operators'
 import { interval, merge } from 'rxjs'
 
-import EventTypes from './event-types'
-import { updateWorld, toggleCell, drawPattern } from './rules-of-life'
-import { patterns } from './patterns'
+import EventTypes from '../helpers/event-types'
+import { updateWorld, toggleCell, drawPattern } from '../helpers/rules-of-life'
+import { patterns } from '../helpers/patterns'
 
 import { streaming } from '../../utils/util-streaming'
 
@@ -48,9 +48,9 @@ const makeInitialWorld = patternName => {
   const TICK = 500
 
   // define event streams and related triggers
-  const [toggleEvent$, toggleEmitter] = streaming()
-  const [resetEvent$, resetEmitter] = streaming()
-  const [activeEvent$, activateEmitter] = streaming()
+  const [toggleEvent$, toggleEmit] = streaming()
+  const [resetEvent$, resetEmit] = streaming()
+  const [activeEvent$, activateEmit] = streaming()
 
   // define and preprocess streams
   const toggle$ = toggleEvent$.pipe(
@@ -112,9 +112,9 @@ const makeInitialWorld = patternName => {
     )
 
   window.GameOfLifeStreams = {
-    toggle: [toggle$, toggleEmitter],
-    reset: [reset$, resetEmitter],
-    active: [active$, activateEmitter],
+    toggle: [toggle$, toggleEmit],
+    reset: [reset$, resetEmit],
+    active: [active$, activateEmit],
     makeWorldStream,
     makeInitialWorld,
     EventTypes,

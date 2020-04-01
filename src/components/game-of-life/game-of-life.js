@@ -1,4 +1,4 @@
-import { h, customElement, useState, useEffect } from 'atomico'
+import { h, customElement } from 'atomico'
 import { useState$ } from '../../utils/util-useState$'
 
 const createEvent = (event, detail) =>
@@ -12,7 +12,7 @@ const createEvent = (event, detail) =>
 const GameOfLife = props => {
   // stream store
   const {
-    toggle: [_, toggleEmitter],
+    toggle: [_, toggleEmit],
     makeWorldStream,
     makeInitialWorld
   } = window.GameOfLifeStreams
@@ -35,7 +35,7 @@ const GameOfLife = props => {
             key={idx}
             style={cellStyle(alive)}
             onclick={e =>
-              toggleEmitter(createEvent('cell_toggle', e.target.dataset))
+              toggleEmit(createEvent('cell_toggle', e.target.dataset))
             }
           />
         )
@@ -47,8 +47,6 @@ const GameOfLife = props => {
 GameOfLife.props = {}
 
 export default customElement('game-of-life', GameOfLife)
-
-// Helpers - Utils
 
 // Helpers - CSS
 const gridStyle = (cols, rows) => {

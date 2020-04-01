@@ -69,9 +69,9 @@ Usage of streamEmitter:
 /src/web-components/gol-streams/gol-streams.js
 ...
 # define event streams and related triggers
-const [toggleEvent$, toggleEmitter] = streamEmitter()
-const [resetEvent$, resetEmitter] = streamEmitter()
-const [activeEvent$, activateEmitter] = streamEmitter()
+const [toggleEvent$, toggleEmit] = streamEmitter()
+const [resetEvent$, resetEmit] = streamEmitter()
+const [activeEvent$, activateEmit] = streamEmitter()
 ...
 ```
 **Subscribe/unsubscribe streams as side effects in useEffect block**
@@ -89,9 +89,9 @@ useEffect(() => {
 ```bash
 /src/web-components/game-of-life/game-of-life.js
 ...
-# emits `cell_toggle` event using `toggleEmitter`
+# emits `cell_toggle` event using `toggleEmit`
 const clickHandler = e =>
-    toggleEmitter(
+    toggleEmit(
       new window.CustomEvent('cell_toggle', { detail: {col, row} })
     )
 ```
