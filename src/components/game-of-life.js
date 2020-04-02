@@ -1,7 +1,6 @@
 import { h, customElement } from 'atomico'
-import { useState$ } from '../utils/util-useState$'
-import streaming from '../context/streaming'
-import { createEvent } from '../utils/util-createEvent'
+import { useState$, createEvent } from '../utils/utils'
+import StreamsEmitters from '../context/streams-emitters'
 
 /*
   Props:
@@ -10,7 +9,7 @@ import { createEvent } from '../utils/util-createEvent'
 */
 const GameOfLife = props => {
   const { initialWorld } = window.GOLAppConstants
-  const [{ world$ }, { toggleEmit }] = streaming
+  const [{ world$ }, { toggleEmit }] = StreamsEmitters
   const { arr, cols, rows } = useState$(world$, initialWorld)
 
   // render grids

@@ -1,12 +1,11 @@
 import { h, customElement } from 'atomico'
-import { useState$ } from '../utils/util-useState$'
-import streaming from '../context/streaming'
-import { createEvent } from '../utils/util-createEvent'
+import { useState$, createEvent } from '../utils/utils'
+import StreamsEmitters from '../context/streams-emitters'
 
 const WebToolbar = () => {
   const { initialWorld } = window.GOLAppConstants
 
-  const [{ active$ }, { activateEmit, resetEmit }] = streaming
+  const [{ active$ }, { activateEmit, resetEmit }] = StreamsEmitters
 
   const resetEvent = createEvent('reset', initialWorld)
 

@@ -30,7 +30,7 @@ import { interval, merge } from 'rxjs'
 import EventTypes from '../helpers/event-types'
 import { updateWorld, toggleCell } from '../helpers/rules-of-life'
 
-import { streaming } from '../utils/util-streaming'
+import { streaming } from '../utils/utils'
 
 /*
   define and pre-process needed streams

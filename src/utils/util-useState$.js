@@ -5,7 +5,7 @@
 */
 import { useState, useEffect } from 'atomico'
 
-export const useState$ = (state$, initialState) => {
+export default (state$, initialState) => {
   const [state, setState] = useState(initialState)
   useEffect(() => {
     const sub = state$.subscribe(setState)

@@ -5,7 +5,7 @@
 */
 import { Subject } from 'rxjs'
 
-export const streaming = () => {
+export default () => {
   const stream$ = new Subject()
   const eventEmit = e => stream$.next(e)
   return [stream$, eventEmit]
