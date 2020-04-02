@@ -24,9 +24,7 @@ const GameOfLife = props => {
             data-row={row}
             key={idx}
             style={cellStyle(alive)}
-            onclick={e =>
-              toggleEmit(createEvent('cell_toggle', e.target.dataset))
-            }
+            onclick={e => toggleEmit(createEvent('toggle', e.target.dataset))}
           />
         )
       })}

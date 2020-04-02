@@ -61,6 +61,7 @@ const reset$ = resetEvent$.pipe(
 const active$ = activeEvent$.pipe(scan((active, event) => !active, true))
 
 const tick$ = interval(TICK).pipe(map(e => ({ event_type: EventTypes.TICK })))
+
 const activeTick$ = merge(tick$, activeEvent$).pipe(
   // scan to add 'active' field
   scan(
