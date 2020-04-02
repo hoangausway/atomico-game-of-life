@@ -1,8 +1,7 @@
 import { h, customElement } from 'atomico'
-import { useState$ } from '../../utils/util-useState$'
-
-const createEvent = (event, detail) =>
-  new window.CustomEvent('cell_toggle', { detail })
+import { useState$ } from '../utils/util-useState$'
+import streaming from '../context/streaming'
+import { createEvent } from '../utils/util-createEvent'
 
 /*
   Props:
@@ -10,17 +9,10 @@ const createEvent = (event, detail) =>
   Events: click [cell]
 */
 const GameOfLife = props => {
-  // stream store
-  const {
-    toggle: [_, toggleEmit],
-    makeWorldStream,
-    makeInitialWorld
-  } = window.GameOfLifeStreams
-
-  // interested world stream with an initial world
-  const initialWorld = makeInitialWorld()
-  const world$ = makeWorldStream(initialWorld)
-  const { arr, cols, rows } = useState$(world$, initialWorld)
+  const { initialWorld } = window.GOLAppConstants
+  const [{ world$ }, { toggleEmit }] = streaming
+  const world = useState$(world$, initialWorld)
+  const { arr, cols, rows } = world
 
   // render grids
   return (
