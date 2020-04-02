@@ -11,9 +11,8 @@ import { createEvent } from '../utils/util-createEvent'
 const GameOfLife = props => {
   const { initialWorld } = window.GOLAppConstants
   const [{ world$ }, { toggleEmit }] = streaming
-  const world = useState$(world$, initialWorld)
-  const { arr, cols, rows } = world
-
+  const { arr, cols, rows } = useState$(world$, initialWorld)
+  
   // render grids
   return (
     <host shadowDom style={gridStyle(cols, rows)}>
