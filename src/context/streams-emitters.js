@@ -1,6 +1,7 @@
 /*
-  The central store of streams which affect our component.
-  It exports a global object named GameOfLifeStreams for components to use.
+  Exports
+  - The streams which play role of state for view components.
+  - The emit functions associated with above streams
 
   As general rules, there're 2 groups of streams:
   - the streams triggered by user interaction (click, typing, etc.)
@@ -8,8 +9,8 @@
 
   1. Create the pairs of raw streams and triggers (may be triggered by user interaction)
   2. Apply some simple transformation as required by business logics
-  3. Assigns as whole object (central store of streams) to global 'window'
-  4. Components can access the store as neccessary. They can use as it or do further transformation.
+  3. Web components can access the streams amd emitters as neccessary.
+     They can subscribe to streams or use them for further transformations.
 
   In this particular application, we will consider the following streams (and corresponding triggers):
   - stream of cell toggling event, triggered when user clicks on a cell in the grid
@@ -17,6 +18,7 @@
   - stream of 'pause/activate' event, triggered when user made a 'pause/continue' action (clicks button [PAUSE/CONTINUE])
   - stream of ticks, which will automatically update grid based on 'rule-of-life' logics
     (this stream is triggered by background 'tick' which taking account of 'pause/activate' events
+  - and the compound stream, named world$, reflects effects of all above streams
 
   NOTES:
   - All transformations in this module are pure functions
@@ -97,7 +99,7 @@ const worldFunc$ = merge(toggle$, reset$, activeTick$).pipe(
   map(worldUpdateFunc)
 )
 
-// make world stream which evolves from initial world
+// make compound world stream which evolves from initial world
 // ---w---w--w-------
 const world$ = worldFunc$.pipe(
   scan((world, f) => f(world), initialWorld)
