@@ -12,7 +12,7 @@ const GameOfLife = props => {
   const { initialWorld } = window.GOLAppConstants
   const [{ world$ }, { toggleEmit }] = streaming
   const { arr, cols, rows } = useState$(world$, initialWorld)
-  
+
   // render grids
   return (
     <host shadowDom style={gridStyle(cols, rows)}>
