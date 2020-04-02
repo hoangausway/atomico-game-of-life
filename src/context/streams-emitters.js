@@ -33,11 +33,12 @@ import EventTypes from '../helpers/event-types'
 import { updateWorld, toggleCell } from '../helpers/rules-of-life'
 
 import { streaming } from '../utils/utils'
+import Params from '../context/params'
 
 /*
   define and pre-process needed streams
 */
-const { initialWorld, TICK } = window.GOLAppConstants
+const { initialWorld, TICK } = Params
 
 // define event streams and related triggers
 const [toggleEvent$, toggleEmit] = streaming()
