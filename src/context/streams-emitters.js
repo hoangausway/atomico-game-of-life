@@ -1,23 +1,24 @@
 /*
   Exports
   - The streams which play role of state for view components.
-  - The emit functions associated with above streams
+  - The associated 'emit' functions which will trigger streams' transition
 
-  As general rules, there're 2 groups of streams:
+  In general, there're 2 groups of streams:
   - the streams triggered by user interaction (click, typing, etc.)
   - the streams created by system (tick)
 
+  Codes:
   1. Create the pairs of raw streams and triggers (may be triggered by user interaction)
-  2. Apply some simple transformation as required by business logics
+  2. Apply some simple transformations as required by business logics
   3. Web components can access the streams amd emitters as neccessary.
      They can subscribe to streams or use them for further transformations.
 
-  In this particular application, we will consider the following streams (and corresponding triggers):
-  - stream of cell toggling event, triggered when user clicks on a cell in the grid
-  - stream of 'reset' event, triggered when user made a 'reset' action (for example: clicks on some [RESET] button)
-  - stream of 'pause/activate' event, triggered when user made a 'pause/continue' action (clicks button [PAUSE/CONTINUE])
+  In this particular application, we will consider the following streams (and associated emitters):
+  - stream of cell toggling events, triggered when user clicks on a cell in the grid
+  - stream of 'reset' event, triggered when user clicks on some [RESET] button
+  - stream of 'pause/activate' event, triggered when user clicks button [PAUSE/CONTINUE]
   - stream of ticks, which will automatically update grid based on 'rule-of-life' logics
-    (this stream is triggered by background 'tick' which taking account of 'pause/activate' events
+    (this stream is triggered by background 'tick'
   - and the compound stream, named world$, reflects effects of all above streams
 
   NOTES:
@@ -56,7 +57,7 @@ const toggle$ = toggleEvent$.pipe(
 const reset$ = resetEvent$.pipe(
   map(e => ({
     event_type: EventTypes.RESET,
-    event_payload: e.detail
+    event_payload: initialWorld
   }))
 )
 
@@ -95,7 +96,7 @@ const worldUpdateFunc = e => {
   }
 }
 
-//  ---f1---f2---f3---, function signature f: world -> world
+//  ---f1---f2---f3---, function's signature f: world -> world
 const worldFunc$ = merge(toggle$, reset$, activeTick$).pipe(
   map(worldUpdateFunc)
 )

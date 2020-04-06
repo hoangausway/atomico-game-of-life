@@ -3,7 +3,7 @@ import { useState$, createEvent } from '../utils/utils'
 import StreamsEmitters from '../context/streams-emitters'
 import Params from '../context/params'
 
-const ToolBar = () => {
+const AToolbar = () => {
   const { initialWorld } = Params
 
   const [{ active$ }, { activateEmit, resetEmit }] = StreamsEmitters
@@ -32,7 +32,7 @@ const ToolBar = () => {
   )
 }
 
-export default customElement('tool-bar', ToolBar)
+export default customElement('a-toolbar', AToolbar)
 
 // Helpers - CSS
 const style = active => `

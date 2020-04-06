@@ -2,11 +2,7 @@ import { h, customElement } from 'atomico'
 import { useState$, createEvent } from '../utils/utils'
 import StreamsEmitters from '../context/streams-emitters'
 import Params from '../context/params'
-/*
-  Props:
-  Render: grid of cells
-  Events: click [cell]
-*/
+
 const GameOfLife = props => {
   const { initialWorld } = Params
   const [{ world$ }, { toggleEmit }] = StreamsEmitters

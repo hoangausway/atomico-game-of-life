@@ -1,2 +1,2 @@
 import './components/game-of-life'
-import './components/tool-bar'
+import './components/a-toolbar'
